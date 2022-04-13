@@ -1,0 +1,69 @@
+####################################################################################
+##makefile for Main program
+####################################################################################
+
+#include "conf/makejsf.tmpl"
+
+
+
+INSTALLDIR = $(PWD)
+SRCDIR     = $(INSTALLDIR)/src
+PROGRAMNAME = MainRawBPDEvent
+#PROGRAMNAME = MainRawEventMC
+
+SRCS          =  $(PROGRAMNAME).$(SrcSuf) \
+                $(SRCDIR)/ALSim/MakeRawBPDEvent_503f.$(SrcSuf) \
+		$(SRCDIR)/ALSim/MakeEventData.$(SrcSuf)    \
+	     	$(SRCDIR)/ALSim/MakeRawEventMC.$(SrcSuf)  \
+	        $(SRCDIR)/ALPatternRecognition/ALPatternRecognition.$(SrcSuf) \
+	        $(SRCDIR)/RKFitter/RKfitter.$(SrcSuf) \
+                $(SRCDIR)/RKFitter/TkrData.$(SrcSuf) \
+                $(SRCDIR)/RKFitter/FieldMap.$(SrcSuf) \
+                $(SRCDIR)/RKFitter/RungeKutta4.$(SrcSuf) \
+	
+			
+
+OBJS	      =	$(subst .$(SrcSuf),.$(ObjSuf),$(SRCS)) \
+		$(PROGRAMNAME)Dict.$(ObjSuf)
+
+HDRS	      = $(subst .$(SrcSuf),.h,$(SRCS))
+
+DICTNAME      = $(PROGRAMNAME)Dict
+
+PROGRAM    = $(PROGRAMNAME)
+
+LIBINSTALLDIR = $(INSTALLDIR)/lib
+INCINSTALLDIR = $(INSTALLDIR)/include
+INCPATH	      = -I. -I$(INCINSTALLDIR)
+CXXFLAGS     += $(INCPATH) -O -g -Wall -Wextra
+#if 0
+CXXFLAGS     += -pg
+LDFLAGS      += -pg
+#endif
+
+
+all:: $(PROGRAM)
+
+dir:
+	
+
+$(PROGRAM): $(OBJS) dir
+	$(LD) -o $(PROGRAM) $(OBJS) \
+	      -L$(LIBINSTALLDIR) -lS4ALSim  -lS4ALPatternReco  \
+	      $(LDFLAGS)
+clean:: 
+	@rm -f $(OBJS) prod/core
+
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f $(PROGRAM) Makefile $(DICTNAME).*
+	@(cd prod; rm -f *.root *.out *~)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+	         -c -I$(INCINSTALLDIR) $(HDRS) LinkDef.h
+                                                              
