@@ -59,11 +59,11 @@ int main(int argc, char* argv[])
     cout << ", OffsetLL:" << OffsetLL[i] ;
     cout << ", OffsetRL:" << OffsetRL[i] << endl;
    }  
- cout << "T1 threshold: " << TrigThresh[0] <<endl;
- cout << "T2 threshold: " << TrigThresh[1] <<endl;
- cout << "T3 threshold: " << TrigThresh[2] <<endl;
- cout << "T4 threshold: " << TrigThresh[3] <<endl;
- cout << "Guard threshold: " << TrigThresh[4] <<endl;
+ //cout << "T1 threshold: " << TrigThresh[0] <<endl;
+ //cout << "T2 threshold: " << TrigThresh[1] <<endl;
+ //cout << "T3 threshold: " << TrigThresh[2] <<endl;
+ //cout << "T4 threshold: " << TrigThresh[3] <<endl;
+ //cout << "Guard threshold: " << TrigThresh[4] <<endl;
   //Start to read the file
  for (string line; getline(filestr,line);)
    {
