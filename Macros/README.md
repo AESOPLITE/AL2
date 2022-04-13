@@ -23,7 +23,8 @@ To Link the macros at the beginning ot the ROOT session:
 
 
 You can then call the macros and functions defined in the 
->root [1] ROOTtoTXT_DATA()
+
+>>root [1] ROOTtoTXT_DATA()
 
 
 
