@@ -38,11 +38,10 @@ All paths have been changed to relative ones, there should be no modifications n
 
 **Edit the file DataFilepaths.txt with the BPD files that you want to reconstruct
 
-"""
 /yourdatapathdirectory/NL6033.BPD 1 2
 
 /yourdatapathdirectory/NL6034.BPD 1 2
-"""
+
 
 The arguments 1 and 2 are flags related to parsing the BPD file. Keep them as they are for now. 
 
