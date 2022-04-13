@@ -21,6 +21,7 @@ cd ..
 cp src/*/*pcm lib
 
 **Update the include repository with the new header files:
+
 cp src/*/*h include
 
 **Create the main executable file by typing:
