@@ -55,15 +55,16 @@ The arguments 1 and 2 are flags related to parsing the BPD file. Keep them as th
 
 RK is the tag for Runger-Kutta
 
-The reconstruction will give you two output ROOT files per BPD files:
+The reconstruction will give you two output ROOT files per BPD file:
 
 /yourdatapathdirectory/NL6033.BPD.root
+
 /yourdatapathdirectory/NL6033.BPD.EVENT_RK.root
 
 The files NL6033.BPD.EVENT_RK.root contain the reconstructed events.
 
 
-The subdirectory AL2/Macros contains the macro the read the output file, select events and print a text file with the desire information.
+The subdirectory AL2/Macros contains the macro to read the output file, select events and print a text file with the desire information.
 See the corresponding README.md
 
 
