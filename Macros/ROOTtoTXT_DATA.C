@@ -19,17 +19,17 @@ void ROOTtoTXT_DATA()
 
  string Inppath="/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
 //string startfile="NL2685_2688_2700.BPD";
- string startfile="NL6034.BPD";
+ string startfile="NL6039.BPD";
  string endfile=".EVENT_RK";
  string directory= "/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
-
- 
 
  //output file
  ofstream outputTXT;
  outputTXT.open(Form("%s/%s%s.txt", Inppath.c_str(),startfile.c_str(),endfile.c_str()));
  outputTXT << "runnumber"  << " " ;				     
  outputTXT << "eventnumber"  << " " ;				     
+ outputTXT << "YYYY/MM/DD"  << " " ;				     
+ outputTXT << "HH:MM:SS"  << " " ;				     
  outputTXT << "CX0reco" << " " ;
  outputTXT << "CY0reco"  << " " ;
  outputTXT << "CZ0reco"  << " " ;					 
@@ -166,11 +166,23 @@ void ROOTtoTXT_DATA()
     int Nhits = NL0 + NL1 + NL2 + NL3 + NL4 + NL5 + NL6 + NL7;
     int NhitsB = NL1 + NL2 + NL3 + NL4 + NL6;
     int NhitsNB = NL0 + NL5 + NL7;
+    
+    int year=e->get_yPHA();
+    int month=e->get_mPHA();
+    int day=e->get_dPHA();
+    int hour=e->get_hPHA();
+    int minute=e->get_miPHA();
+    int second=e->get_sPHA();
+    
+    
+    
     ////////////////////////////////////
-    //TRIGGER CUT
+    //OUTPUT
     ////////////////////////////////////
     outputTXT << Form("%5d",e->get_runnumber())  << " ";
     outputTXT << Form("%5d",e->get_eventnumber())  << " ";
+    outputTXT << Form("%4d/%02d/%02d", year,month,day) << " ";
+    outputTXT << Form("%02d:%02d:%02d", hour,minute,second) << " ";
     outputTXT << Form("%1.4f",(float)e->get_CX0reco())  << " ";
     outputTXT << Form("%1.4f",(float)e->get_CY0reco())  << " ";
     outputTXT << Form("%1.4f",(float)e->get_CZ0reco())  << " ";
