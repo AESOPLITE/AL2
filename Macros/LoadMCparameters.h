@@ -12,7 +12,7 @@ using namespace std;
 #define LOADMCPARAMETERS_H
 
 void LoadMCparameters(string filename,int*,int*,int*,float*,float*,float*,int*);
-void LoadMCparameters(string filename,double*,double*,double*);
+//void LoadMCparameters(string filename,double*,double*,double*);
 
 
 

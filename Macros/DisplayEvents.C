@@ -65,7 +65,7 @@ void DisplayEvents()
  float*TrigThresh=new float[5];
  for(int i=0;i<nbl;i++)TckZPos[i]=OffsetLL[i]=OffsetRL[i]=0;
  for(int i=0;i<5;i++)TrigThresh[i]=0;
- int geoconf=7;
+ int geoconf=11;
  string paramfile=Form("Dataparameters%d.dat",geoconf); 
 
  LoadDataparameters(paramfile,TckZPos,OffsetLL,OffsetRL,TrigThresh);
@@ -77,11 +77,12 @@ void DisplayEvents()
     cout << ", OffsetRL:" << OffsetRL[i] << endl;
    } 
 
- string Inppath="/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
+ //string Inppath="/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
+ string Inppath="/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData";
  //string startfile="NL2685_2688_2700.BPD";
- string startfile="NL2984.BPD";
+ string startfile="NL3132.BPD";
  string endfile=".EVENT_RK";
- string directory= "/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
+ string directory= "/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData";
 
  //float mass=0.000511;//electon mass in GeV
  //if(t==11 || t==10)     mass=0.10566;//muon mass in GeV
@@ -89,9 +90,8 @@ void DisplayEvents()
  //if(t==6)     mass=3.7273;//alpha-particle mass in GeV
 
  
- TFile *fileout=new TFile(Form("%s/DisplayEvent_%s%s.root",Inppath.c_str(),startfile.c_str(),endfile.c_str()),"RECREATE");
+ TFile *fileout=new TFile(Form("%s/DisplayEvent_MIP_%s%s.root",Inppath.c_str(),startfile.c_str(),endfile.c_str()),"RECREATE");
  TCanvas *can=new TCanvas();
- 
  
  int firstpage=0;
  TFile*filein=new TFile(Form("%s/%s%s.root",Inppath.c_str(),startfile.c_str(),endfile.c_str()),"READ");
@@ -105,14 +105,15 @@ void DisplayEvents()
  int nentries=tree->GetEntries();
  cout << "Number  of events: " << nentries << endl;
  
- float ZMax=50;
- float ZMin=-50;
- 
+ float ZMax=40;
+ float ZMin=-34;
+ float xymin = -21;
+ float xymax = +21;
  bool FLAGFIT=false ;
  
  //Loop over events
  //for(int i=0;i<nentries;i++)
- for(int i=0;i<1000;i++)
+ for(int i=0;i<2000;i++)
    {
     tree->GetEntry(i);
     if(i%10000==0) cout << "Event: " << i <<endl;
@@ -203,7 +204,7 @@ void DisplayEvents()
     //Insulation Foam
     //if(nTFoam==0) continue;
     //for(int j=0;j<1;j++) 
-    //  {
+    //  {1
     //   EFoam+=1000.*e->get_EneIsofoam().at(j);
     //   tFoam=e->get_timeIsofoam().at(j);
     //  }
@@ -239,35 +240,43 @@ void DisplayEvents()
     ///////////////////////////////
  
     //cout << "Event " << i << ", NLNB = " << NLNB << ", NLB = " << NLB << endl;      
-    if(e->get_deflecPR()!=0) FLAGFIT=true;
+    //if(e->get_deflecPR()!=0) FLAGFIT=true;
 
-    //if(NLB==0 || NLNB==0) continue;
+    //if(NLB!=5 || NLNB!=3) continue;
     //if(e->get_deflecPR()==0) continue;
-    //if(EG>0) continue;
-    //if(E1<=0) continue;
-    //if(E2>128) continue;
-    //if(E3<=200) continue;
-    //if(E4<=0) continue;
+    //if(e->get_TrTrig1()!=1)      continue; 
+    //if(e->get_TrTrig0()!=1)      continue; 
+    //if(abs(pPR)>100) continue;
+    if(EG>15) continue;
+    if(E1>=1000) continue;
+    //if(E2<30) continue;
+    if(E3>=1000) continue;
+    if(E4>=1000) continue;
+    //if(Nhits<=8) continue;
 
+    if(e->get_T1()!=1) continue;
+    if(e->get_T2()!=1) continue;
+    if(e->get_T3()!=1) continue;
+    
     ///////////////////////////////    
     //Extract hits information
     ///////////////////////////////
  
     TGraph *grALLNB=new TGraph();
-    grALLNB->SetMarkerStyle(5);
+    grALLNB->SetMarkerStyle(kFullCircle);
     grALLNB->SetMarkerColor(kBlack);
     grALLNB->SetMarkerSize(2);
     TGraph *grALLB=new TGraph();
-    grALLB->SetMarkerStyle(5);
+    grALLB->SetMarkerStyle(kFullCircle);
     grALLB->SetMarkerColor(kBlack);
     grALLB->SetMarkerSize(2);
     TGraph *grNB=new TGraph();
-    grNB->SetMarkerStyle(kCircle);
-    grNB->SetMarkerColor(kOrange+7);
+    grNB->SetMarkerStyle(kFullCircle);
+    grNB->SetMarkerColor(kBlack);
     grNB->SetMarkerSize(2);
     TGraph *grB=new TGraph();
-    grB->SetMarkerStyle(kCircle);
-    grB->SetMarkerColor(kOrange+7);
+    grB->SetMarkerStyle(kFullCircle);
+    grB->SetMarkerColor(kBlack);
     grB->SetMarkerSize(2);
     TGraph *grNBPR=new TGraph();
     grNBPR->SetMarkerStyle(kCircle);
@@ -284,7 +293,7 @@ void DisplayEvents()
        float z=e->get_hits().at(j)->get_z();
        int nstrip = e->get_hits().at(j)->get_nstrips();
        int fstripID=e->get_hits().at(j)->get_fstripID();		
-       if (L==7 && fstripID==575 &&nstrip==1) cout << "Event " << i <<", bad chip, L7!" << endl;
+       //if (L==7 && fstripID==575 &&nstrip==1) cout << "Event " << i <<", bad chip, L7!" << endl;
        
        float xPR=e->get_hits().at(j)->get_xPR();
        float yPR=e->get_hits().at(j)->get_yPR();
@@ -342,7 +351,7 @@ void DisplayEvents()
     
     TF1* fNB=new TF1("fNB","pol1",-125,125);
     fNB->SetLineColor(kBlue);
-    fNB->SetLineWidth(1);
+    fNB->SetLineWidth(2);
     fNB->SetLineStyle(1);    
 
     float zz0=0;
@@ -350,7 +359,7 @@ void DisplayEvents()
     TF1* fB= new TF1("fB","[2]*(x+[3])*(x+[3])+[1]*(x+[3])+[0]",-100,100);
     fB->FixParameter(3,zz0);
     fB->SetLineColor(kBlue);
-    fB->SetLineWidth(1);
+    fB->SetLineWidth(2);
     fB->SetLineStyle(1);    
     //cout << "Extraction of non-bending plane fit parameters done" <<endl;
 
@@ -394,15 +403,15 @@ void DisplayEvents()
       //Incoming Straight particle  
 
       incomingB->SetLineStyle(2);
-      incomingB->SetLineWidth(1);
+      incomingB->SetLineWidth(2);
       incomingB->SetLineColor(kBlue);
 
       incomingB->FixParameter(0,-(aa-diff*lim)/diff);
       incomingB->FixParameter(1,1./diff);
     
       incomingBout->SetLineStyle(2);
-      incomingBout->SetLineWidth(1);
-      incomingBout->SetLineColor(kGray);
+      incomingBout->SetLineWidth(2);
+      incomingBout->SetLineColor(kMagenta);
       incomingBout->FixParameter(0,-(aa-diff*lim)/diff);
       incomingBout->FixParameter(1,1./diff);    
     
@@ -411,7 +420,7 @@ void DisplayEvents()
       outcomingB->FixParameter(0,-(aaout-diffout*limo)/diffout);
       outcomingB->FixParameter(1,1./diffout);
       outcomingB->SetLineStyle(2);
-      outcomingB->SetLineWidth(1);
+      outcomingB->SetLineWidth(2);
       outcomingB->SetLineColor(kBlue);
      
     
@@ -427,9 +436,16 @@ void DisplayEvents()
     //Event Display 
     ///////////////////////////////
     //cout << "Start display "  << endl;
+    
+    //if(e->get_eventnumber()==484  || e->get_eventnumber()==17595) {gStyle->SetOptTitle(0);}
+    //else{gStyle->SetOptTitle(1);}
+    gStyle->SetOptTitle(1);
     can=new TCanvas(Form("Event %d",e->get_eventnumber()),Form("Event %d",e->get_eventnumber()),200,10,1600,1440);
     //can=new TCanvas(Form("Event %d",e->get_eventnumber()),Form("Event %d",e->get_eventnumber()),200,10,920,370);
 
+      
+       //int fstripID=e->get_hits().at(j)->get_fstripID();		
+       //if (L==7 && fstripID==575 &&nstrip==1) cout << "Event " << i <<", bad chip, L7!" << e
     can->Divide(2,1);
     //Detector layout
     //Layers
@@ -448,10 +464,11 @@ void DisplayEvents()
     boxM4->SetFillColor(kGray);
     //cout << "could it be here?" << endl;
     //T1
-    TBox*boxT1=new TBox(-13.,33.782,13.,33.782+0.5);
+    //TBox*boxT1=new TBox(-13.,33.782,13.,33.782+0.5);
+    TBox*boxT1=new TBox(-13.97,33.782,13.97,33.782+0.5);
     boxT1->SetFillColor(kRed);
-    if(T1)boxT1->SetFillColor(kGreen);
-    TPaveText*PHT1=new TPaveText(15,32,25,36);
+    if(T1)boxT1->SetFillColor(8);
+    TPaveText*PHT1=new TPaveText(13,32,20,36);
     PHT1->AddText(Form("T1=%4d",int(E1)));
     //PHT1->AddText(Form("T1"));
     PHT1->SetFillStyle(0);PHT1->SetBorderSize(0);
@@ -466,8 +483,8 @@ void DisplayEvents()
     grT2->SetLineWidth(3);
     grT2->SetLineColor(kRed);
     //if(T2)grT2->SetLineColor(kGreen); 
-    if(E2>192)grT2->SetLineColor(kGreen); 
-    TPaveText*PHT2=new TPaveText(15,11,25,15);
+    if(E2>192)grT2->SetLineColor(8); 
+    TPaveText*PHT2=new TPaveText(13,11,20,15);
     PHT2->AddText(Form("T2=%4d",int(E2)));
     //PHT2->AddText(Form("T2"));
 
@@ -476,8 +493,8 @@ void DisplayEvents()
     TBox*boxT3=new TBox(-3.5,0.,3.5,0.5);
     boxT3->SetFillColor(kRed);
     //if(T3)boxT3->SetFillColor(kGreen);
-    if(E3>200)boxT3->SetFillColor(kGreen); 
-    TPaveText*PHT3=new TPaveText(15,-1,25,3);
+    if(E3>200)boxT3->SetFillColor(8); 
+    TPaveText*PHT3=new TPaveText(13,-1,20,3);
     PHT3->AddText(Form("T3=%4d",int(E3)));
     //PHT3->AddText(Form("T3"));
     PHT3->SetFillStyle(0);PHT3->SetBorderSize(0);
@@ -485,43 +502,65 @@ void DisplayEvents()
     TBox*boxG1=new TBox(-13.5,-0.5588,-3.5,-0.5588+0.5);
     boxG1->SetFillColor(kRed);
     //if(guard)boxG1->SetFillColor(kGreen);
-    if(EG>200)boxG1->SetFillColor(kGreen); 
+    if(EG>200)boxG1->SetFillColor(8); 
 
     TBox*boxG2=new TBox(+3.5,-0.5588,13.5,-0.5588+0.5);
     boxG2->SetFillColor(kRed);
 //    if(guard)boxG2->SetFillColor(kGreen);     
-    if(EG>200)boxG2->SetFillColor(kGreen); 
-    TPaveText*PHG=new TPaveText(15,-3,25,1);
+    if(EG>200)boxG2->SetFillColor(8); 
+    TPaveText*PHG=new TPaveText(13,-3,20,1);
     PHG->AddText(Form("G=%4d", int(EG)));
     //PHG->AddText(Form("Guard")); 
     PHG->SetFillStyle(0);PHG->SetBorderSize(0);
     
     //T4
-    TBox*boxT4=new TBox(-18.,-25.59012+shift8L,18.,-25.59012+1+shift8L);
+    //TBox*boxT4=new TBox(-18.,-25.59012+shift8L,18.,-25.59012+1+shift8L);
+    TBox*boxT4=new TBox(-15.,-25.59012+shift8L,15.,-25.59012+1+shift8L);
     boxT4->SetFillColor(kRed);
-    if(T4)boxT4->SetFillColor(kGreen);
-    TPaveText*PHT4=new TPaveText(15,-25+shift8L,25,-21+shift8L);
+    if(T4)boxT4->SetFillColor(8);
+    TPaveText*PHT4=new TPaveText(13,-25+shift8L,20,-21+shift8L);
     PHT4->AddText(Form("T4=%4d",int(E4)));
     //PHT4->AddText(Form("T4"));
     PHT4->SetFillStyle(0);PHT4->SetBorderSize(0);
-    
+
     //Non Bending plot   
     can->cd(1);
-    
+
     TMultiGraph* multi=new TMultiGraph();
     multi->SetTitle(Form("Event %d",e->get_eventnumber()));
     if(NLNB>0) multi->Add(grALLNB,"p");
-    if(NLNB>0) multi->Add(grNB,"p");
+    //if(NLNB>0) multi->Add(grNB,"p");
     //multi->Add(grNBPR,"p");	
     multi->Add(grT2,"");
     multi->Draw("a");
-    multi->GetXaxis()->SetTitle("X (cm)");
-    multi->GetYaxis()->SetTitle("Z (cm)");
+    //multi->GetXaxis()->SetTitle("X (cm)");
+    //multi->GetYaxis()->SetTitle("Z (cm)");
+    
+    multi->SetTitle("Non-bending plane;X (cm);Z (cm)");
+    
     multi->GetYaxis()->SetTitleOffset(1.1);
-    multi->GetXaxis()->SetLimits(-30,30);
-    multi->SetMaximum(ZMax);
+    multi->GetYaxis()->CenterTitle(true);
+    multi->GetXaxis()->CenterTitle(true);
+    multi->GetXaxis()->SetLimits(xymin,xymax);
+    //multi->SetMaximum(ZMax);
     multi->SetMinimum(ZMin);
-    gPad->Modified(); gPad->Update();    
+    multi->GetXaxis()->SetLabelSize(0.045);
+    multi->GetYaxis()->SetLabelSize(0.045); 
+    multi->GetYaxis()->SetTitleSize(0.045); 
+    multi->GetXaxis()->SetTitleSize(0.045); 
+    //gPad->Modified(); gPad->Update();    
+    
+    Double_t w = gPad->GetWw()*gPad->GetAbsWNDC();
+    Double_t h = gPad->GetWh()*gPad->GetAbsHNDC();
+    
+    ZMax=ZMin+(xymax-xymin)*h/w;
+    multi->SetMaximum(ZMax);
+
+    gPad->Modified();;gPad->Update();  
+    
+    
+    
+    
     
     TLine * Line0=new TLine(0,ZMin,0,ZMax);
     Line0->SetLineColor(kGray);
@@ -563,17 +602,17 @@ void DisplayEvents()
        if(ijk==0 || ijk==5 || ijk==7)
         {
          Line[ijk]=new TLine(-9,TckZPos[ijk],9,TckZPos[ijk]);
-         Line[ijk]->SetLineColor(kRed);  
-         Line[ijk]->SetLineWidth(1.5);  
+         Line[ijk]->SetLineColor(kBlack);  
+         Line[ijk]->SetLineWidth(1);  
   	}
 
        else
         {
          Line[ijk]=new TLine(-9,TckZPos[ijk],9,TckZPos[ijk]);
          Line[ijk]->SetLineColor(kBlack);  
-         Line[ijk]->SetLineWidth(1.5);  
+         Line[ijk]->SetLineWidth(1);  
    	}
-       Line[ijk]->Draw("same");  	
+       Line[ijk]->Draw("same");  
       }//ijk	 
 
 
@@ -596,8 +635,8 @@ void DisplayEvents()
      {
       ThetaNB=new TPaveText(0,42,sh,46);
       ThetaNB->SetFillStyle(0);ThetaNB->SetBorderSize(0);
-      ThetaNB->AddText(Form("#theta_{NB}= %6.4f",TMath::ATan(p1)));
-      ThetaNB->Draw();
+      //ThetaNB->AddText(Form("#theta_{NB}= %6.4f",TMath::ATan(p1)));
+      //ThetaNB->Draw();
      }
     
     //cout << "After NB thetaIn"   <<endl; 
@@ -612,7 +651,8 @@ void DisplayEvents()
     //cout << "bending side plot" << endl;
     //Bending plot   
     can->cd(2);
-    //Triclk to the Inverse bending track for display
+
+    //Triclk to the Inverse bending track for displaySize
     int Nn=500;
     Double_t*x=new Double_t[Nn]; 
     Double_t*y=new Double_t[Nn];
@@ -631,21 +671,50 @@ void DisplayEvents()
     gr->SetLineColor(kBlue);
     gr->SetLineWidth(2);
 
+
+    gStyle->SetTitleY(0.95) ; 
+    
+    
     TMultiGraph *multiB=new TMultiGraph();
     //multiB->SetTitle("Bending plane");
     if(NLB>0) multiB->Add(grALLB,"p");
-    if(NLB>0) multiB->Add(grB,"p");
+    //if(NLB>0) multiB->Add(grB,"p");
     //multiB->Add(grBPR,"p");	
     multiB->Add(grT2,"");
     if(NLB>0) multiB->Add(gr,"l");
     multiB->Draw("a");
-    multiB->GetXaxis()->SetTitle("Y (cm)");
-    multiB->GetYaxis()->SetTitle("Z (cm)");
+    //multiB->GetXaxis()->SetTitle("Y (cm)");
+    //multiB->GetYaxis()->SetTitle("Z (cm)");
+
+    multiB->SetTitle("Bending plane;Y (cm);Z (cm)");
+
+    
     multiB->GetYaxis()->SetTitleOffset(1.1);
-    multiB->GetXaxis()->SetLimits(-30,30);
-    multiB->SetMaximum(ZMax);
+    multiB->GetYaxis()->CenterTitle(true);
+    multiB->GetXaxis()->CenterTitle(true);
+    multiB->GetXaxis()->SetLimits(xymin,xymax);
+    multiB->GetXaxis()->SetLabelSize(0.045);
+    multiB->GetYaxis()->SetLabelSize(0.045); 
+    multiB->GetYaxis()->SetTitleSize(0.045); 
+    multiB->GetXaxis()->SetTitleSize(0.045); 
+
+    
     multiB->SetMinimum(ZMin);
+
     gPad->Modified();gPad->Update();
+    w = gPad->GetWw()*gPad->GetAbsWNDC();
+    h= gPad->GetWh()*gPad->GetAbsHNDC();
+    //cout << w << " " << h << endl;
+    ZMax=ZMin+(xymax-xymin)*h/w;
+    multiB->SetMaximum(ZMax);
+    gPad->SetBorderSize(16);
+    //gPad->SetBorderColor(kBlue);
+    gPad->Modified();;gPad->Update();  
+    
+    
+    
+    
+    
     
     Line0->Draw("same");
 
@@ -669,31 +738,38 @@ void DisplayEvents()
     boxG2->SetLineColor(1);
     boxG1->Draw("l same");
     boxG2->Draw("l same");
-    //T4
-    boxT4->Draw("l same");
-	 
-    PHT1->Draw();
-    PHT2->Draw();	 
-    PHT3->Draw();
-    PHG->Draw();
-    PHT4->Draw();
 
+
+    
     for(int ijk=0;ijk<nbl;ijk++)
       {
        if(ijk==0 || ijk==5 || ijk==7)
         {
          Line[ijk]=new TLine(-9,TckZPos[ijk],9,TckZPos[ijk]);
          Line[ijk]->SetLineColor(kBlack);  
-         Line[ijk]->SetLineWidth(1.5);  
+         Line[ijk]->SetLineWidth(1);  
  	}
        else
         {
          Line[ijk]=new TLine(-9,TckZPos[ijk],9,TckZPos[ijk]);
-         Line[ijk]->SetLineColor(kRed);  
-         Line[ijk]->SetLineWidth(1.5);  
+         Line[ijk]->SetLineColor(kBlack);  
+         Line[ijk]->SetLineWidth(1);  
         }
        Line[ijk]->Draw("same");  	
       }	 
+   
+
+
+
+    //T4
+    boxT4->Draw("l same");
+	 
+    //PHT1->Draw();
+    //PHT2->Draw();	 
+    //PHT3->Draw();
+    //PHG->Draw();
+    //PHT4->Draw();
+
 	 
 	//cout << "line 677"   <<endl; 
 	
@@ -716,7 +792,7 @@ void DisplayEvents()
     
       ThetaIn=new TPaveText(0,42,sh,46);    
       ThetaIn->SetFillStyle(0);ThetaIn->SetBorderSize(0);
-      ThetaIn->AddText(Form("#theta_{Bin}= %6.3f",TMath::ATan(diff)));
+      //ThetaIn->AddText(Form("#theta_{Bin}= %6.3f",TMath::ATan(diff)));
 
       //cout << "after B thetaIn"   <<endl; 
     
@@ -726,7 +802,7 @@ void DisplayEvents()
     
       ThetaOut=new TPaveText(0,-36,sh,-32);
       ThetaOut->SetFillStyle(0);ThetaOut->SetBorderSize(0);
-      ThetaOut->AddText(Form("#theta_{Bout}= %6.3f",TMath::ATan(diffout)));
+      //ThetaOut->AddText(Form("#theta_{Bout}= %6.3f",TMath::ATan(diffout)));
     
       if(FLAGFIT)ThetaIn->Draw();
       if(FLAGFIT)ThetaOut->Draw();
@@ -739,10 +815,10 @@ void DisplayEvents()
       Def2=TMath::ATan(diffout)-TMath::ATan(diff);
       deflection=Def2;
       //Def->AddText(Form("p_{MC} at L_{0}= %3.1f MeV/c",(float)p0MC));
-      Def->AddText(Form("p_{PR} at L_{0}= %3.1f MeV/c",(float)pPR));
-      //Def->AddText(Form("p_{RK} at L_{0}= %3.1f MeV/c",(float)preco));
+      //Def->AddText(Form("p_{PR} at L_{0}= %3.1f MeV/c",(float)pPR));
+      Def->AddText(Form("p_{RK} at L_{0}= %3.1f MeV/c",(float)preco));
       Def->SetFillStyle(0);Def->SetBorderSize(0);
-      Def->Draw();
+     //Def->Draw();
 	  
       TPaveText*Cur=new TPaveText(10,-23,25,-16);
       Cur->AddText(Form("Curvature at L1=%5.4f",curv[2]));
@@ -766,22 +842,24 @@ void DisplayEvents()
       ZenAngle->SetTextColor(kBlue);
       ZenAngle->AddText(Form("Zen. angle #theta_{0}= %3.2f^{#circ}",zen));
       //ZenAngle->Draw(); 	 
-   
+      
       //if(incomingB->GetX(33.25)<-14 ||incomingB->GetX(33.25)>14)continue;
       //fileout->cd();
       //can->Write();
      }
-    
-    if(firstpage==0) can->Print(Form("%s/DisplayEvent_%s%s.pdf(",Inppath.c_str(),startfile.c_str(),endfile.c_str()),Form("Title:Event %d",e->get_eventnumber()));
-    else can->Print(Form("%s/DisplayEvent_%s%s.pdf",Inppath.c_str(),startfile.c_str(),endfile.c_str()),Form("Title:Event %d",e->get_eventnumber()));
+ 
+    if(firstpage==0) can->Print(Form("%s/DisplayEvent_MIP_%s%s.pdf(",Inppath.c_str(),startfile.c_str(),endfile.c_str()),Form("Title:Event %d",e->get_eventnumber()));
+    else can->Print(Form("%s/DisplayEvent_MIP_%s%s.pdf",Inppath.c_str(),startfile.c_str(),endfile.c_str()),Form("Title:Event %d",e->get_eventnumber()));
 
+   // if(e->get_eventnumber()==484  || e->get_eventnumber()==17595) {can->Print(Form("%s/DisplayEvent_%d_%s%s.pdf",Inppath.c_str(),e->get_eventnumber(),startfile.c_str(),endfile.c_str()));}
+    
     firstpage=-1;
     delete can;
    }//i
 	
 fileout->Close();
 can=new TCanvas();
-can->Print(Form("%s/DisplayEvent_%s%s.pdf)",Inppath.c_str(),startfile.c_str(),endfile.c_str()));
+can->Print(Form("%s/DisplayEvent_MIP_%s%s.pdf)",Inppath.c_str(),startfile.c_str(),endfile.c_str()));
 
 }//end function
 

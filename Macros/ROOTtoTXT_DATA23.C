@@ -13,18 +13,18 @@
 
 ClassImp(ALTckhit)
 ClassImp(ALEvent)
-void ROOTtoTXT_DATA(string filename);
+void ROOTtoTXT_DATA23(string filename);
 
-void ROOTtoTXT_DATA(string filename)
+void ROOTtoTXT_DATA23(string filename)
 {	
 
- string Inppath="/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData/";
+ string Inppath="/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData/DataPi";
  //string Inppath="/media/psmangeard/DATA2/AESOPLite2/Palestine2022/ToFCalibration/";
  //string Inppath="/media/psmangeard/DATA2/AESOPLite2/NewPSOCRuns/";
  //string startfile="NL4145.BPD";
  string startfile=filename;
  string endfile=".EVENT_RK";
- string directory= "/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData/";
+ string directory= "/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData/DataPi";
  //string directory= "/media/psmangeard/DATA2/AESOPLite2/NewPSOCRuns";
  //string directory= "/media/psmangeard/DATA2/AESOPLite2/Palestine2022/ToFCalibration/";
 
@@ -35,6 +35,8 @@ void ROOTtoTXT_DATA(string filename)
  outputTXT << "eventnumber"  << " " ;				     
  outputTXT << "YYYY/MM/DD"  << " " ;				     
  outputTXT << "HH:MM:SS"  << " " ;				     
+ outputTXT << Form("%s", "P1") << " ";    
+ outputTXT << Form("%s", "P2") << " ";    
  outputTXT << "CX0reco" << " " ;
  outputTXT << "CY0reco"  << " " ;
  outputTXT << "CZ0reco"  << " " ;					 
@@ -204,6 +206,8 @@ void ROOTtoTXT_DATA(string filename)
     outputTXT << Form("%5d",e->get_eventnumber())  << " ";
     outputTXT << Form("%4d/%02d/%02d", year,month,day) << " ";
     outputTXT << Form("%02d:%02d:%02d", hour,minute,second) << " ";
+    outputTXT << Form("%5.2f",e->get_P1MPHK())  << " ";
+    outputTXT << Form("%5.2f",e->get_P2MPHK())  << " ";
     outputTXT << Form("%1.4f",(float)e->get_CX0reco())  << " ";
     outputTXT << Form("%1.4f",(float)e->get_CY0reco())  << " ";
     outputTXT << Form("%1.4f",(float)e->get_CZ0reco())  << " ";
