@@ -1,1 +1,1 @@
-/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns/NL6034.BPD 1 2
+/data2/AESOPLite2/McMurdo2023/FlightData/DataPi/NL1097.BPD 1 2

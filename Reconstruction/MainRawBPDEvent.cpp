@@ -31,10 +31,10 @@ int main(int argc, char* argv[])
 //Open input file
  ifstream filestr;
  filestr.open(argv[1]);
- int geoconf=8; 
+ int geoconf=12; 
  string RecoID = argv[2];
  string filename;
- 
+ cout<< "Hello MainRawBPDEvent" <<endl; 
  if(filestr.is_open())
   {
    cout << "The file " << argv[1] << " is open ... (bug in this message)"<< endl ;
@@ -59,15 +59,16 @@ int main(int argc, char* argv[])
     cout << ", OffsetLL:" << OffsetLL[i] ;
     cout << ", OffsetRL:" << OffsetRL[i] << endl;
    }  
- //cout << "T1 threshold: " << TrigThresh[0] <<endl;
- //cout << "T2 threshold: " << TrigThresh[1] <<endl;
- //cout << "T3 threshold: " << TrigThresh[2] <<endl;
- //cout << "T4 threshold: " << TrigThresh[3] <<endl;
- //cout << "Guard threshold: " << TrigThresh[4] <<endl;
+ cout << "T1 threshold: " << TrigThresh[0] <<endl;
+ cout << "T2 threshold: " << TrigThresh[1] <<endl;
+ cout << "T3 threshold: " << TrigThresh[2] <<endl;
+ cout << "T4 threshold: " << TrigThresh[3] <<endl;
+ cout << "Guard threshold: " << TrigThresh[4] <<endl;
   //Start to read the file
  for (string line; getline(filestr,line);)
    {
-    //Here the full line is read and stored in the string object "line" 
+    //Here the full line is read and cout<< "Hello MainRawBPDEvent" <<endl; 
+ //stored in the string object "line" 
     cout << line <<endl; //Print the file path
  vector<string> input;
  //Split the line 

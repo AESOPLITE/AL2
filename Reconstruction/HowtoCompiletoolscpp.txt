@@ -1,0 +1,1 @@
+g++ -c -g  -fPIC -Wall `root-config --cflags` tools.cpp 

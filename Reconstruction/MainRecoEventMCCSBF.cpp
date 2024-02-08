@@ -1,28 +1,27 @@
-#include "MainRecoEventMC.h"
+#include "MainRecoEventMCCSBF.h"
 
 using namespace std;
 
 int main(int argc, char*argv[]) 
 {
 
- if(argc!=6)
+ if(argc!=5)
   {
    cout << "Wrong number of parameters!!!!" << endl;
    cout << "The program needs 5 input parameters:"<< endl;
    cout << "First is Fluka type of simulated particles" <<endl;
-   cout << "Second is energy in MeV or GeV" <<endl;
-   cout << "Fourth is first cycle to reconstruct (Starts at 1)" <<endl;
-   cout << "Fifth is the number of cycle to reconstruct" <<endl;
-   cout << "Six is tag of reconstruction" <<endl;
+   cout << "Second is first cycle to reconstruct (Starts at 1)" <<endl;
+   cout << "Third is the number of cycle to reconstruct" <<endl;
+   cout << "Fourth is tag of reconstruction" <<endl;
    return -1;
   }
   
  //Fluka type of particle
  int type=(int) atoi(argv[1]);           //3 for electrons
- int Ene=(int) atoi(argv[2]);            //Energy 
- int Ncycles=(int) atoi(argv[3]);        //first cycle to reconstruct
- int Ncycles2=(int) atoi(argv[4]);       //last cycle
- string RecoInd=argv[5];                 //string Reco Index: allows to distinct between types of reconstruction
+ int Ene=0  ;         //Energy 
+ int Ncycles=(int) atoi(argv[2]);        //first cycle to reconstruct
+ int Ncycles2=(int) atoi(argv[3]);       //last cycle
+ string RecoInd=argv[4];                 //string Reco Index: allows to distinct between types of reconstruction
  int DataType= 0;                        //datatype, 0=MC, 1 = data
 
 
@@ -61,18 +60,20 @@ int main(int argc, char*argv[])
 
  string fN = "./src/RKFitter/fieldmap5mm.bin";
  FieldMap *fM = new FieldMap(fN, "binary", 81);
- string startfile="AL2NonUniB_V2";
+ string startfile="AL2NonUniB_V3";
  string endfile="_fort.99";
- string source = "rootfiles";
+ string source = ".";
  int seed = 0;
 
  //Input files 
  //string Inppath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V0";
- string Inppath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V2";
+ //string Inppath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V2";
+ string Inppath="/data/psmangeard/AESOPLITE2/AL2/CSBF/V3";
 
  //Output files
  //string Outpath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V0";
- string Outpath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V2";
+ //string Outpath="/data/psmangeard/AESOPLITE2/AL2/TestOutput/V2";
+ string Outpath="/data/psmangeard/AESOPLITE2/AL2/CSBF/V3";
 
 
  for(int j=Ncycles;j<Ncycles+Ncycles2;j++)//Number of cycles
@@ -80,10 +81,10 @@ int main(int argc, char*argv[])
     TFile *file;
     TFile *fileout;
     //input file
-    file=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%dMeV%d%03d%s.root",Inppath.c_str(),type,source.c_str(),startfile.c_str(),type,Ene,seed,j,endfile.c_str()),"READ");
+    file=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%d%03d%s.root",Inppath.c_str(),type,source.c_str(),startfile.c_str(),type,seed,j,endfile.c_str()),"READ");
     cout << "Input file is open" <<endl;
     //output file
-    fileout=new TFile(Form("%s/%d/%s/RecoEvent_%s_%d_%dMeV%d%03d%s_%s.root",Outpath.c_str(),type,source.c_str(),startfile.c_str(),type,Ene,seed,j,endfile.c_str(),RecoInd.c_str()),"RECREATE");
+    fileout=new TFile(Form("%s/%d/%s/RecoEvent_%s_%d_%d%03d%s_%s.root",Outpath.c_str(),type,source.c_str(),startfile.c_str(),type,seed,j,endfile.c_str(),RecoInd.c_str()),"RECREATE");
 
     //Get Tree from the input file
     TTree *tree = (TTree*)file->Get("MC");
@@ -131,7 +132,7 @@ int main(int argc, char*argv[])
        //cout << "FindPattern return = " << PR << endl;  
        double deflecPR = re->get_deflecPR(); 
        
-       if(deflecPR==0 || NLNB<2 || NLB<3 )
+       if(deflecPR==0 || NLNB<2 || NLB<3)
         {
          REtree->Fill();
          delete re;
@@ -142,7 +143,7 @@ int main(int argc, char*argv[])
        //////////////////////////////
        //Runge-Kutta reconstruction//
        //////////////////////////////
-        
+       
        else 
         {
          double event = re->get_eventnumber();

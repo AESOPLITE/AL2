@@ -1,0 +1,18 @@
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2084.BPD 1 2 
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2085.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2088.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2089.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2090.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2091.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2092.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2101.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2102.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2103.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2109.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2110.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2111.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2113.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2116.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2121.BPD 1 2
+/data/smechbal/Data/GroundRuns/Sweden2018/NL2122.BPD 1 2
+
