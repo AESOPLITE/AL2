@@ -3,6 +3,7 @@
 ///    Department of Physics and Astronomy, University of Delaware, October 28, 2016
 ///				Sarah Mechbal, smechbal@ucsc.edu
 ////   Department of Physics, University of California Santa Cruz
+////   November 16,2022: Major upgrade and cleaning for AESOP-Lite 2
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __ALEVENT__
 #define __ALEVENT__
@@ -16,16 +17,205 @@ class ALEvent:public TObject
  private:
 
    int eventnumber; //Event number
-   int runnumber; //Run number
    int bpdnumber; //bpd file number
 
-   //Data FROM "PHA" LINE, trigger information
-   int yPHA;//Year from PHA line linked to the event
-   int mPHA;//Month from PHA line linked to the event
-   int dPHA;//Day from PHA line linked to the event
-   int hPHA;//Hour from PHA line linked to the event
-   int miPHA;//Minute from PHA line linked to the event
-   int sPHA;//Second from PHA line linked to the event
+   //Data FROM "PSE1" LINE, trigger information
+
+   int yPSE1;//Year from PSE1 line linked to the event
+   int mPSE1;//Month from PSE1 line linked to the event
+   int dPSE1;//Day from PSE1 line linked to the event
+   int hPSE1;//Hour from PSE1 line linked to the event
+   int miPSE1;//Minute from PSE1 line linked to the event
+   int sPSE1;//Second from PSE1 line linked to the event
+   int N;//N: 92
+   int Code;//Code: 221
+   int nEcho;//nEcho: 0
+   int Last;//Last: 32
+   int FirstNibble;//ZERO FirstNibble: 15
+   int runnumber;//run number
+   int Trigger;//triggered event number in run runnumber
+   int Stamp;//time
+
+   int Go1;//Number of missing events due to Readout dead time
+   int yPSE1b;//Year from Date/Time PSE1 line linked to the event
+   int mPSE1b;//Month from Date/Time PSE1 line linked to the event
+   int dPSE1b;//Day from Date/Time PSE1 line linked to the event
+   int hPSE1b;//Hour from Date/Time PSE1 line linked to the event
+   int miPSE1b;//Minute from Date/Time PSE1 line linked to the event
+   int sPSE1b;//Second from Date/Time PSE1 line linked to the event
+   unsigned Status;      //8-bit trigger word: T4 T3 T2 T1 Guard Trackertrigger1 Trackertrigger0 PMTsecondary PMTprimary  
+   //Online Triggers status from Status:
+   bool T4;
+   bool T3;
+   bool T2;
+   bool T1;
+   bool TrTrig1;
+   bool TrTrig0;
+   bool PMTTrig2;
+   bool PMTTrig1;
+   bool G;
+
+   //Data FROM "PSE2" LINE, some tracker information
+   
+   int yPSE2=-1;//Year from PSE2 line linked to the event
+   int mPSE2=-1;//Month from PSE2 line linked to the event
+   int dPSE2=-1;//Day from PSE2 line linked to the event
+   int hPSE2=-1;//Hour from PSE2 line linked to the event
+   int miPSE2=-1;//Minute from PSE2 line linked to the event
+   int sPSE2=-1;//Second from PSE2 line linked to the event
+  
+   int sTraxtrig=-1;//sTraxTrig: 0032
+   int TraxTrig=-1;//TraxTrig: 50
+   int TraxComm=-1;//TraxComm: 132
+   int TraxPatt=-1;//TraxPatt: 215 
+   int TotalTrax=-1;//TotalTrax: 8 
+   int TotalBytes=-1;//TotalBytes: 14500 FINI
+
+ 
+   //PEHF1,2,3,4 lines
+   //EVENT PSOC HOUSE KEEPING lines
+   //If time of line 1 and time of line 4 are different then there is an issue
+   //PEHF1: 09/29/2022 16:28:46 Date: 01/01/2001 01:01:43 Run: 1 Source: FF00FF
+   //PEHF2: 09/29/2022 16:28:46 ComLast: 0AB6 ComCount: 149 ComErr: 0 GenErr: 2 Go: 5 Go1: 0 AvgROTime: 224
+   //PEHF3: 09/29/2022 16:28:46 Rates:  149 1323 396 75 318 TrCom: 224 Tr1Pct: 80 Tr2Pct: 20 UARTErr: 0 UARTTim: 0
+//PEHF4: 11/10/2023 19:22:54 Chips:  7 7 7 6 6 5 5 5 OrRates:  15 341 179 119 4 6 7 7 Temps:  35.0 24.5 22.1 TrackStats:  0 0 0 0 PctMaBzy: 0.0 PctTrLive: 0.0 Samples: 39352 PctADCLive: 99.0
+
+   int yEPHK1;//Year from PEHF1 line linked to the event
+   int mEPHK1;//Month from PEHF1 line linked to the event
+   int dEPHK1;//Day from PEHF1 line linked to the event
+   int hEPHK1;//Hour from PEHF1 line linked to the event
+   int miEPHK1;//Minute from PEHF1 line linked to the event 
+   int sEPHK1;//Second from PEHF1 line linked to the event
+   int yEPHK1b;//Year from PEHF1 line Date linked to the event
+   int mEPHK1b;//Month from PEHF1 line Date linked to the event
+   int dEPHK1b;//Day from PEHF1 line Date linked to the event
+   int hEPHK1b;//Hour from PEHF1 line Date linked to the event
+   int miEPHK1b;//Minute from PEHF1 line Date linked to the event
+   int sEPHK1b;//Second from PEHF1 line Date linked to the event
+  
+   int yEPHK4;//Year from PEHF4 line linked to the event
+   int mEPHK4;//Month from PEHF4 line linked to the event
+   int dEPHK4;//Day from PEHF4 line linked to the event
+   int hEPHK4;//Hour from PEHF4 line linked to the event
+   int miEPHK4;//Minute from PEHF4 line linked to the event
+   int sEPHK4;//Second from PEHF4 line linked to the event 
+ 
+   //PEHF1  EVENT PSOC HOUSEKEEPING HIGH RATE
+   int RunEPHK; 
+   string SourceEPHK;   //Source of the EVENT PSOC HOUSEKEEPING
+   //PEHF2
+   string ComLast;     //Last Command
+   int ComCount;    //Command Count 
+   int ComErr;     //Command Error Count
+   int GenErr;      //General Error Count
+   int Go;          //NUmber of events
+   int Go1EPHK;      //Number of missing events
+   int AvgROTime;   //Average Readout time in microsec
+   //PEHF3
+   int T1r; //Single rate T1
+   int T2r; //Single rate T2
+   int T3r; //Single rate T3
+   int T4r; //Single rate T4
+   int Gr;  //Single rate Guard
+   int TrCom;   //Tracker Command Count
+   int Tr1Pct;   //Percentage of tracker trigger 1
+   int Tr2Pct;   //Percentage of tracker trigger 2 
+   int UARTErr;   //Tracker UART Error Count
+   int UARTTim;   //Tracker UART Timeout Count 
+   //PEHF4
+   int NhperCh[8];   //hits per layer event*10
+   int Lrate[8];     //Tracker Layer rate 
+   int Ldummy[8];     //dummy Layerfrom ASI
+ 
+   //Temperatures:
+   float PSOCDieTemp;
+   float TempL0;
+   float TempL7; 
+   //TrackStats
+   float TrackStats[6]; //Tracker Stat
+   // It contains:
+   //average number of Channel-A TOF hits per event
+   //average number of Channel-B TOF hits per event
+   //maximum number of Channel-A TOF hits in one event
+   //maximum number of Channel-B TOF hits in one event
+   //percent Main-PSOC busy fraction
+   //percent trigger live fraction
+    
+   int Samples; //Number of sample used to calculate PctLive  
+   float PctMaBzy;
+   float PctTrLive;
+   float PctADCLive;
+  
+   
+   
+   //PMHF1 MAIN PSOC HOUSEKEEPING 
+   //PMHF1: 07/19/2022 13:29:16 Date: 07/19/2022 13:29:07 DeltaT: 5716.00 Source: FF00FF LastCmd: 0320 CountCmd: 2 ErrCmd: 0 ErrGen: 12 Missing: 0 FIFOPct: 0 Drop232: 0 DropUSB: 0 
+   int yMPHK1;//Year from PMHF1 line linked to the event
+   int mMPHK1;//Month from PMHF1 line linked to the event
+   int dMPHK1;//Day from PMHF1 line linked to the event
+   int hMPHK1;//Hour from PMHF1 line linked to the event
+   int miMPHK1;//Minute from PMHF1 line linked to the event 
+   int sMPHK1;//Second from PMHF1 line linked to the event
+   int yMPHK1b;//Year from PMHFb1 line linked to the event
+   int mMPHK1b;//Month from PMHF1b line linked to the event
+   int dMPHK1b;//Day from PMHF1b line linked to the event
+   int hMPHK1b;//Hour from PMHF1b line linked to the event
+   int miMPHK1b;//Minute from PMHF1b line linked to the event 
+   int sMPHK1b;//Second from PMHF1b line linked to the event
+   float DeltaT;
+   string SourceMPHK;
+   int LastCmdMPHK;
+   int CountCmdMPHK;
+   int ErrCmdMPHK;
+   int ErrGenMPHK;
+   int MissingMPHK;//PSOC Live time percentage using N Samples between the last 2 events
+   int FIFOPctMPHK;
+   int Drop232MPHK;
+   int DropUSBMPHK;
+    
+   //PMHF2
+   //PMHF2: 07/19/2022 13:29:16 BarCounts: 29028110 149972000 29255638 149731314 BarRates:  -198586.8 -274361.6 -200137.7 -272696.6 400.0 0.00 400.0 0.00
+   //int BarCounts[4];
+   //int BarRate[4];
+   float P1MPHK; 
+   float P2MPHK; 
+   float Temp1MPHK; 
+   float Temp2MPHK; 
+
+   //PMHF3
+   //PMHF3: 07/19/2022 13:29:16 Dp: 2010065 Dt: -2099950 IntPress: 750.24 IntTemp: 42.3 BoardTemp: 43.0 DieTemp: 44.0 Analog: 3.47 147.33 3.32 91.66 5.01 840.30 5.25 4.25 15.24 3.61 2730.47 121.43 
+   int yMPHK3;//Year from PMHF3 line linked to the event
+   int mMPHK3;//Month from PMHF3 line linked to the event
+   int dMPHK3;//Day from PMHF3 line linked to the event
+   int hMPHK3;//Hour from PMHF3 line linked to the event
+   int miMPHK3;//Minute from PMHF3 line linked to the event 
+   int sMPHK3;//Second from PMHF3 line linked to the event
+   int Dp;
+   int Dt;
+   float IntPress;
+   float IntTemp;
+   float BoardTemp;
+   float DieTemp;
+   float Dig3V;
+   float Dig3C;
+   float Ana3V;
+   float Ana3C;
+   float Dig5V;
+   float Dig5C;
+   float Ana5V;
+   float Ana5C;
+   float Dig15V;
+   float TckV;
+   float TckC;
+   float TckbiasC;
+
+   //Data FROM "PSE1" LINE, trigger information
+   int yPHA;//Year from PSE1 line linked to the event
+   int mPHA;//Month from PSE1 line linked to the event
+   int dPHA;//Day from PSE1 line linked to the event
+   int hPHA;//Hour from PSE1 line linked to the event
+   int miPHA;//Minute from PSE1 line linked to the event
+   int sPHA;//Second from PSE1 line linked to the event
    double GoPHA;//Go counter
    double tPHA;//timer
 
@@ -50,16 +240,27 @@ class ALEvent:public TObject
    string L[8];//Data from  ASI lines of the event
    int flagL[8];//1 if ASI line was present
 
+   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+   //Read FROM "PSE1" LINE
    //From April 4th 2022
-   //Read from line PSE1
-   unsigned Status;      //8-bit trigger word: 000 Guard Trackertrigger1 Trackertrigger0 PMTsecondary PMTprimary  
+   //unsigned Status;      //8-bit trigger word: 000 Guard Trackertrigger1 Trackertrigger0 PMTsecondary PMTprimary  
    //individual boolen trigger
-   bool G;
-   bool TrTrig1;
-   bool TrTrig0;
-   bool PMTTrig2;
-   bool PMTTrig1;
-
+   //bool TrTrig1;
+   //bool TrTrig0;
+   //bool PMTTrig2;
+   //bool PMTTrig1;
+   //Time
+   //int Stamp; //added on June 21st 2022 
+   //PSOC time from PSE1 line Data/Time
+   //int yPSO;//Year from PSE1 line linked to the event
+   //int mPSO;//Month from PSE1 line linked to the event
+   //int dPSO;//Day from PSE1 line linked to the event
+   //int hPSO;//Hour from PSE1 line linked to the event
+   //int miPSO;//Minute from PSE1 line linked to the event
+   //int sPSO;//Second from PSE1 line linked to the event
+   //int Go1; //Number of missing events due to Readout dead time
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
    //Monte Carlo information: Truth variable names finish with MC
    int ncase;
    int typeMC; 					//type of particle
@@ -68,6 +269,7 @@ class ALEvent:public TObject
    double X0MC,Y0MC,Z0MC;			//Coordinates of the partcle at the injection point
    double CX0MC,CY0MC,CZ0MC; 			//Incidence cosines of the partcle at the injection point
    int typePP;
+
    double EkPP;
    double ZenPP;
    double AziPP;
@@ -126,10 +328,6 @@ class ALEvent:public TObject
    std::vector<float> posAge;
    std::vector<float> posP;
    //External Triggers
-   bool T1;
-   bool T2;
-   bool T3;
-   bool T4;
    bool guard;
    //Energy for MC, PHA pulse height for data
    std::vector<double> EneT1;
@@ -137,7 +335,7 @@ class ALEvent:public TObject
    std::vector<double> EneT3;
    std::vector<double> EneT4;
    std::vector<double> Eneg;
-   std::vector<double> PHA6; //for data only 6th PHA
+   std::vector<double> ToF; //Time of flight
    //For MC, position of particles in the scintillators
    std::vector<double> XT1;
    std::vector<double> XT3;
@@ -158,11 +356,8 @@ class ALEvent:public TObject
    std::vector<double> timeIsofoam;
    std::vector<double> timeShell;
 
-
-   //MC: Number of optical photon produced in T2 (20/05/2019: For testing CK in MC, no sure it is working fine in Fluka yet)
+   //MC: Number of optical photons produced in T2 (20/05/2019: For testing CK in MC, not sure it is working fine in Fluka yet)
    int NphCK;
-
-
 
    //Internal Triggers
    //Tracker layer for 0 to 7. top layer is 0
@@ -240,7 +435,7 @@ class ALEvent:public TObject
    int hVCI;//Hour from VCI line linked to the event (last read VCI line)
    int miVCI;//Minute from VCI line linked to the event (last read VCI line)
    int sVCI;//Second from VCI line linked to the event (last read VCI line)
-   int Lrate[8];    //Tracker Layer rate  from the last VCI read line
+   //int Lrate[8];    //Tracker Layer rate  from the last VCI read line
 
 
 
@@ -258,6 +453,9 @@ class ALEvent:public TObject
    float HeatV;
    float TrackC;
    float TrackV;
+   float IntPiV;
+   float IntPiC;
+ 
  public:
    //Constructors
    ALEvent();// Default
@@ -271,9 +469,179 @@ class ALEvent:public TObject
    //"setting" member methods
    ////////////////////////////////
    void set_eventnumber(int a){eventnumber=a;}
-   void set_runnumber(int a){runnumber=a;}
-   void set_bpdtnumber(int a){bpdnumber=a;}
+   void set_bpdnumber(int a){bpdnumber=a;}
 
+   //PSE1 line
+   void set_yPSE1(int a){yPSE1=a;}
+   void set_mPSE1(int a){mPSE1=a;}
+   void set_dPSE1(int a){dPSE1=a;}
+   void set_hPSE1(int a){hPSE1=a;}
+   void set_miPSE1(int a){miPSE1=a;}
+   void set_sPSE1(int a){sPSE1=a;}
+   void set_N(int a){N=a;}
+   void set_Code(int a){Code=a;}
+   void set_nEcho(int a){nEcho=a;}
+   void set_Last(int a){Last=a;}
+   void set_FirstNibble(int a){FirstNibble=a;}
+   void set_runnumber(int a){runnumber=a;}
+   void set_Trigger(int a){Trigger=a;}
+   void set_Stamp(int a){Stamp=a;}
+   void set_Go1(int a){Go1=a;}
+ 
+   void set_yPSE1b(int a){yPSE1b=a;}
+   void set_mPSE1b(int a){mPSE1b=a;}
+   void set_dPSE1b(int a){dPSE1b=a;}
+   void set_hPSE1b(int a){hPSE1b=a;}
+   void set_miPSE1b(int a){miPSE1b=a;}
+   void set_sPSE1b(int a){sPSE1b=a;}
+   
+   void set_Status(unsigned a)
+       {
+        Status=a;
+        T4=bool(Status &0x80);
+        T3=bool(Status &0x40);
+        T2=bool(Status &0x20);
+        T1=bool(Status &0x10);
+        TrTrig1=bool(Status & 0x08);
+        TrTrig0=bool(Status & 0x04);
+        PMTTrig2=bool(Status & 0x02);
+        PMTTrig1=bool(Status & 0x01);
+       }  
+   
+   //PSE2 line   
+   void set_yPSE2(int a){yPSE2=a;}
+   void set_mPSE2(int a){mPSE2=a;}
+   void set_dPSE2(int a){dPSE2=a;}
+   void set_hPSE2(int a){hPSE2=a;}
+   void set_miPSE2(int a){miPSE2=a;}
+   void set_sPSE2(int a){sPSE2=a;}
+     
+   void set_sTraxtrig(int a){sTraxtrig=a;}
+   void set_TraxTrig(int a){TraxTrig=a;}
+   void set_TraxComm(int a){TraxComm=a;}
+   void set_TraxPatt(int a){TraxPatt=a;} 
+   void set_TotalTrax(int a){TotalTrax=a;} 
+   void set_TotalBytes(int a){TotalBytes=a;}
+
+   //PEHF1,2,3,4 lines
+   //HOUSE KEEPING lines
+
+   void set_yEPHK1(int a){yEPHK1=a;}
+   void set_mEPHK1(int a){mEPHK1=a;}
+   void set_dEPHK1(int a){dEPHK1=a;}
+   void set_hEPHK1(int a){hEPHK1=a;}
+   void set_miEPHK1(int a){miEPHK1=a;}
+   void set_sEPHK1(int a){sEPHK1=a;}
+ 
+   void set_yEPHK1b(int a){yEPHK1b=a;}
+   void set_mEPHK1b(int a){mEPHK1b=a;}
+   void set_dEPHK1b(int a){dEPHK1b=a;}
+   void set_hEPHK1b(int a){hEPHK1b=a;}
+   void set_miEPHK1b(int a){miEPHK1b=a;}
+   void set_sEPHK1b(int a){sEPHK1b=a;}
+  
+   void set_yEPHK4(int a){yEPHK4=a;}
+   void set_mEPHK4(int a){mEPHK4=a;}
+   void set_dEPHK4(int a){dEPHK4=a;}
+   void set_hEPHK4(int a){hEPHK4=a;}
+   void set_miEPHK4(int a){miEPHK4=a;}
+   void set_sEPHK4(int a){sEPHK4=a;}
+ 
+   //PEHF1
+   void set_RunEPHK(int a){RunEPHK=a;} 
+   void set_SourceEPHK(string a){SourceEPHK=a;}   //Source of the EVENT PSOC HOUSEKEEPING
+   //PEHF2
+   void set_ComLast(string a){ComLast=a;}     //Last Command
+   void set_ComCount(int a){ComCount=a;}      //Command Count 
+   void set_ComErr(int a){ComErr=a;}          //Command Error Count
+   void set_GenErr(int a){GenErr=a;}          //General Error Count
+   void set_Go(int a){Go=a;}                  //NUmber of events
+   void set_Go1EPHK(int a){Go1EPHK=a;}         //Number of missing events
+   void set_AvgROTime(int a){AvgROTime=a;}    //Average Readout time in microsec
+   //PEHF3
+   void set_T1r(int a){T1r=a;}  //Single rate T1
+   void set_T2r(int a){T2r=a;}  //Single rate T2
+   void set_T3r(int a){T3r=a;}  //Single rate T3
+   void set_T4r(int a){T4r=a;}  //Single rate T4
+   void set_Gr(int a){Gr=a;}    //Single rate Guard
+   void set_TrCom(int a){TrCom=a;}     //Tracker Command Count
+   void set_Tr1Pct(int a){Tr1Pct=a;}   //Percentage of tracker trigger 1
+   void set_Tr2Pct(int a){Tr2Pct=a;}   //Percentage of tracker trigger 2 
+   void set_UARTErr(int a){UARTErr=a;} //Tracker UART Error Count
+   void set_UARTTim(int a){UARTTim=a;} //Tracker UART Timeout Count 
+   //PEHF4
+   void set_NhperCh(int k, int a){if(k<8)NhperCh[k]=a;}  //hits per layer event*10
+   void set_Lrate(int k, int a){if(k<8)Lrate[k]=a;}      //Tracker Layer rate  
+   //Temperatures:
+   void set_PSOCDieTemp(float a){PSOCDieTemp=a;}
+   void set_TempL0(float a){TempL0=a;}
+   void set_TempL7(float a){TempL7=a;}
+   //TrackStats
+   void set_TrackStats(int k, float a){if(k<6)TrackStats[k]=a;} //Tracker Stat
+   void set_Samples(int a){Samples=a;}  //Number of sample used to calculate PctLive
+   void set_PctADCLive(float a){PctADCLive=a;} 
+   void set_PctMaBzy(float a){PctMaBzy=a;} 
+   void set_PctTrLive(float a){PctTrLive=a;} 
+
+   //PMHF1 MAIN PSOC HOUSEKEEPING 
+   //PMHF1: 07/19/2022 13:29:16 Date: 07/19/2022 13:29:07 DeltaT: 5716.00 Source: FF00FF LastCmd: 0320 CountCmd: 2 ErrCmd: 0 ErrGen: 12 Missing: 0 FIFOPct: 0 Drop232: 0 DropUSB: 0 
+   void set_yMPHK1(int a){yMPHK1=a;}//Year from PMHF1 line linked to the event
+   void set_mMPHK1(int a){mMPHK1=a;}//Month from PMHF1 line linked to the event
+   void set_dMPHK1(int a){dMPHK1=a;}//Day from PMHF1 line linked to the event
+   void set_hMPHK1(int a){hMPHK1=a;}//Hour from PMHF1 line linked to the event
+   void set_miMPHK1(int a){miMPHK1=a;}//Minute from PMHF1 line linked to the event 
+   void set_sMPHK1(int a){sMPHK1=a;}//Second from PMHF1 line linked to the event
+   void set_yMPHK1b(int a){yMPHK1b=a;}//Year from PMHFb1 line linked to the event
+   void set_mMPHK1b(int a){mMPHK1b=a;}//Month from PMHF1b line linked to the event
+   void set_dMPHK1b(int a){dMPHK1b=a;}//Day from PMHF1b line linked to the event
+   void set_hMPHK1b(int a){hMPHK1b=a;}//Hour from PMHF1b line linked to the event
+   void set_miMPHK1b(int a){miMPHK1b=a;}//Minute from PMHF1b line linked to the event 
+   void set_sMPHK1b(int a){sMPHK1b=a;}//Second from PMHF1b line linked to the event
+   void set_DeltaT(float a){DeltaT=a;}
+   void set_SourceMPHK(string a){SourceMPHK=a;}
+   void set_LastCmdMPHK(int a){LastCmdMPHK=a;}
+   void set_CountCmdMPHK(int a){CountCmdMPHK=a;}
+   void set_ErrCmdMPHK(int a){ErrCmdMPHK=a;}
+   void set_ErrGenMPHK(int a){ErrGenMPHK=a;}
+   void set_MissingMPHK(int a){MissingMPHK=a;}
+   void set_FIFOPctMPHK(int a){FIFOPctMPHK=a;}
+   void set_Drop232MPHK(int a){Drop232MPHK=a;}
+   void set_DropUSBMPHK(int a){DropUSBMPHK=a;}
+    
+   //PMHF2
+   //PMHF2: 07/19/2022 13:29:16 BarCounts: 29028110 149972000 29255638 149731314 BarRates:  -198586.8 -274361.6 -200137.7 -272696.6 400.0 0.00 400.0 0.00
+   void set_P1MPHK(float a){P1MPHK=a;}
+   void set_P2MPHK(float a){P2MPHK=a;}
+   void set_Temp1MPHK(float a){Temp1MPHK=a;} 
+   void set_Temp2MPHK(float a){Temp2MPHK=a;}
+
+   //PMHF3
+   //PMHF3: 07/19/2022 13:29:16 Dp: 2010065 Dt: -2099950 IntPress: 750.24 IntTemp: 42.3 BoardTemp: 43.0 DieTemp: 44.0 Analog: 3.47 147.33 3.32 91.66 5.01 840.30 5.25 4.25 15.24 3.61 2730.47 121.43 
+   void set_yMPHK3(int a){yMPHK3=a;}//Year from PMHF3 line linked to the event
+   void set_mMPHK3(int a){mMPHK3=a;}//Month from PMHF3 line linked to the event
+   void set_dMPHK3(int a){dMPHK3=a;}//Day from PMHF3 line linked to the event
+   void set_hMPHK3(int a){hMPHK3=a;}//Hour from PMHF3 line linked to the event
+   void set_miMPHK3(int a){miMPHK3=a;}//Minute from PMHF3 line linked to the event 
+   void set_sMPHK3(int a){sMPHK3=a;}//Second from PMHF3 line linked to the event
+   void set_Dp(int a){Dp=a;}
+   void set_Dt(int a){Dt=a;}
+   void set_IntPress(float a){IntPress=a;}
+   void set_IntTemp(float a){IntTemp=a;}
+   void set_BoardTemp(float a){BoardTemp=a;}
+   void set_DieTemp(float a){DieTemp=a;}
+   void set_Dig3V(float a){Dig3V=a;}
+   void set_Dig3C(float a){Dig3C=a;}
+   void set_Ana3V(float a){Ana3V=a;}
+   void set_Ana3C(float a){Ana3C=a;}
+   void set_Dig5V(float a){Dig5V=a;}
+   void set_Dig5C(float a){Dig5C=a;}
+   void set_Ana5V(float a){Ana5V=a;}
+   void set_Ana5C(float a){Ana5C=a;}
+   void set_Dig15V(float a){Dig15V=a;}
+   void set_TckV(float a){TckV=a;}
+   void set_TckC(float a){TckC=a;}
+   void set_TckbiasC(float a){TckbiasC=a;}
+    
    void set_yPHA(int a){yPHA=a;}
    void set_mPHA(int a){mPHA=a;}
    void set_dPHA(int a){dPHA=a;}
@@ -283,7 +651,7 @@ class ALEvent:public TObject
    void set_GoPHA(double a){GoPHA=a;}
    void set_tPHA(double a){tPHA=a;}
    void set_yEVT(int a){yEVT=a;}
-   void set_mEVT(int a){mEVT=a;}
+   void set_mEVT(int a){mEVT=a;} 
    void set_dEVT(int a){dEVT=a;}
    void set_hEVT(int a){hEVT=a;}
    void set_miEVT(int a){miEVT=a;}
@@ -300,18 +668,11 @@ class ALEvent:public TObject
 
    void set_L(int k, string a){if(k<8)L[k]=string(a);}
    void set_flagL(int k, int a){if(k<8)flagL[k]=a;}
+   void set_Ldummy(int k, int a){if(k<8)Ldummy[k]=a;}
 
    ////////////////////////////////
-   void set_Status(unsigned a)
-       {
-        Status=a;
-	G=bool(Status &0x10);
-	TrTrig1=bool(Status & 0x08);
-	TrTrig0=bool(Status & 0x04);
-	PMTTrig2=bool(Status & 0x02);
-	PMTTrig1=bool(Status & 0x01);
-       }
- 
+
+
    ////////////////////////////////
    void set_ncase(int a){ncase=a;}
    void set_typeMC(int a){typeMC=a;}
@@ -331,6 +692,8 @@ class ALEvent:public TObject
    void set_CoLonSP(double a){CoLonSP=a;}
 
    ////////////////////////////////
+   // HIts information
+   ////////////////////////////////
    void set_Nhits(int a){Nhits=a;}
    void add_Nhits(){Nhits++;}
 
@@ -339,7 +702,8 @@ class ALEvent:public TObject
 
 
    ////////////////////////////////
-
+   //Pattern Recognition
+   ////////////////////////////////
    void set_EkPR(double a){EkPR=a;}
    void set_p0PR(double a){p0PR=a;}
    void set_aPR(double b){aPR=b;}
@@ -365,6 +729,8 @@ class ALEvent:public TObject
    void set_thNBPR(float a){thNBPR=a;}
    void set_NLPR(int k, int a){if(k<8)NLPR[k]=a;}
 
+   ////////////////////////////////
+   //Reconstrution
    ////////////////////////////////
    void set_typereco(int a){typereco=a;}
    void set_Ekreco(double a){Ekreco=a;}
@@ -435,7 +801,7 @@ class ALEvent:public TObject
    void add_EneT3(double a){EneT3.push_back(a);}
    void add_EneT4(double a){EneT4.push_back(a);}
    void add_Eneg(double a){Eneg.push_back(a);}
-   void add_PHA6(double a){PHA6.push_back(a);}
+   void add_ToF(double a){ToF.push_back(a);}
    void add_XT1(double a){XT1.push_back(a);}
    void add_XT3(double a){XT3.push_back(a);}
    void add_XT4(double a){XT4.push_back(a);}
@@ -456,7 +822,7 @@ class ALEvent:public TObject
    void add_timeShell(double a){timeShell.push_back(a);}
    void set_NphCK(int a){NphCK=a;}
 
-  //HOUSEKEEPING FROM COUNTERS 1 AND 3
+   //HOUSEKEEPING FROM COUNTERS 1 AND 3
    void set_yCT1(int a){yCT1=a;}
    void set_mCT1(int a){mCT1=a;}
    void set_dCT1(int a){dCT1=a;}
@@ -519,7 +885,9 @@ class ALEvent:public TObject
    void set_HeatV(float a){HeatV=a;}
    void set_TrackC(float a){TrackC=a;}
    void set_TrackV(float a){TrackV=a;}
-
+   void set_IntPiV(float a){IntPiV=a;}
+   void set_IntPiC(float a){IntPiC=a;}
+   
    //Data FROM "VCI" LINE
 
    void set_yVCI(int a){yVCI=a;}
@@ -528,7 +896,7 @@ class ALEvent:public TObject
    void set_hVCI(int a){hVCI=a;}
    void set_miVCI(int a){miVCI=a;}
    void set_sVCI(int a){sVCI=a;}
-   void set_Lrate(int k, int a){if(k<8)Lrate[k]=a;}
+   //void set_Lrate(int k, int a){if(k<8)Lrate[k]=a;}
 
 
 
@@ -536,9 +904,190 @@ class ALEvent:public TObject
    //"Getting" member methods
    ////////////////////////////////
    int get_eventnumber(){return eventnumber;}
-   int get_runnumber(){return runnumber;}
    int get_bpdnumber(){return bpdnumber;}
 
+   //PSE1 line
+   int get_yPSE1(){return yPSE1;}
+   int get_mPSE1(){return mPSE1;}
+   int get_dPSE1(){return dPSE1;}
+   int get_hPSE1(){return hPSE1;}
+   int get_miPSE1(){return miPSE1;}
+   int get_sPSE1(){return sPSE1;}
+   int get_N(){return N;}
+   int get_Code(){return Code;}
+   int get_nEcho(){return nEcho;}
+   int get_Last(){return Last;}
+   int get_FirstNibble(){return FirstNibble;}
+   int get_runnumber(){return runnumber;}
+   int get_Trigger(){return Trigger;}
+   int get_Stamp(){return Stamp;}
+   int get_Go1(){return Go1;}
+ 
+   int get_yPSE1b(){return yPSE1b;}
+   int get_mPSE1b(){return mPSE1b;}
+   int get_dPSE1b(){return dPSE1b;}
+   int get_hPSE1b(){return hPSE1b;}
+   int get_miPSE1b(){return miPSE1b;}
+   int get_sPSE1b(){return sPSE1b;}
+   
+   unsigned get_Status(){return Status;}
+   bool get_G(){return G;}
+   bool get_T4(){return T4;}
+   bool get_T3(){return T3;}
+   bool get_T2(){return T2;}
+   bool get_T1(){return T1;}
+   bool get_TrTrig1(){return TrTrig1;}
+   bool get_TrTrig0(){return TrTrig0;}
+   bool get_PMTTrig2(){return PMTTrig2;}
+   bool get_PMTTrig1(){return PMTTrig1;}
+   
+   //PSE2 line   
+   int get_yPSE2(){return yPSE2;}
+   int get_mPSE2(){return mPSE2;}
+   int get_dPSE2(){return dPSE2;}
+   int get_hPSE2(){return hPSE2;}
+   int get_miPSE2(){return miPSE2;}
+   int get_sPSE2(){return sPSE2;}
+     
+   int get_sTraxtrig(){return sTraxtrig;}
+   int get_TraxTrig(){return TraxTrig;}
+   int get_TraxComm(){return TraxComm;}
+   int get_TraxPatt(){return TraxPatt;} 
+   int get_TotalTrax(){return TotalTrax;} 
+   int get_TotalBytes(){return TotalBytes;}   
+   
+   
+   
+   
+   //PEHF1,2,3,4 lines
+   //HOUSE KEEPING lines
+   //EVENT PSOC House Keeping
+
+   int get_yEPHK1(){return yEPHK1;}
+   int get_mEPHK1(){return mEPHK1;}
+   int get_dEPHK1(){return dEPHK1;}
+   int get_hEPHK1(){return hEPHK1;}
+   int get_miEPHK1(){return miEPHK1;}
+   int get_sEPHK1(){return sEPHK1;}
+ 
+   int get_yEPHK1b(){return yEPHK1b;}
+   int get_mEPHK1b(){return mEPHK1b;}
+   int get_dEPHK1b(){return dEPHK1b;}
+   int get_hEPHK1b(){return hEPHK1b;}
+   int get_miEPHK1b(){return miEPHK1b;}
+   int get_sEPHK1b(){return sEPHK1b;}
+  
+   int get_yEPHK4(){return yEPHK4;}
+   int get_mEPHK4(){return mEPHK4;}
+   int get_dEPHK4(){return dEPHK4;}
+   int get_hEPHK4(){return hEPHK4;}
+   int get_miEPHK4(){return miEPHK4;}
+   int get_sEPHK4(){return sEPHK4;}
+ 
+   //PEHF1
+   int get_RunEPHK(){return RunEPHK;} 
+   string get_SourceEPHK(){return SourceEPHK;}   //Source of the EVENT PSOC HOUSEKEEPING
+   //PEHF2
+   string get_ComLast(){return ComLast;}    //Last Command
+   int get_ComCount(){return ComCount;}     //Command Count 
+   int get_ComErr(){return ComErr;}         //Command Error Count
+   int get_GenErr(){return GenErr;}         //General Error Count
+   int get_Go(){return Go;}                 //NUmber of events
+   int get_Go1EPHK(){return Go1EPHK;}         //Number of missing events
+   int get_AvgROTime(){return AvgROTime;}   //Average Readout time in microsec
+   //PEHF3
+   int get_T1r(){return T1r;}  //Single rate T1
+   int get_T2r(){return T2r;}  //Single rate T2
+   int get_T3r(){return T3r;}  //Single rate T3
+   int get_T4r(){return T4r;}  //Single rate T4
+   int get_Gr(){return Gr;}    //Single rate Guard
+   int get_TrCom(){return TrCom;}     //Tracker Command Count
+   int get_Tr1Pct(){return Tr1Pct;}   //Percentage of tracker trigger 1
+   int get_Tr2Pct(){return Tr2Pct;}   //Percentage of tracker trigger 2 
+   int get_UARTErr(){return UARTErr;} //Tracker UART Error Count
+   int get_UARTTim(){return UARTTim;} //Tracker UART Timeout Count 
+   //PEHF4
+   int get_NhperCh(int k)
+       {if(k<8){return NhperCh[k];}
+        else {return -1;} } //hits per layer event*10
+   int get_Lrate(int k)
+       {if(k<8){return Lrate[k];}
+        else {return -1;} }
+   int get_Ldummy(int k)
+       {if(k<8){return Ldummy[k];}
+        else {return -1;} }
+   //Temperatures:
+   float get_PSOCDieTemp(){return PSOCDieTemp;}
+   float get_TempL0(){return TempL0;}
+   float get_TempL7(){return TempL7;}
+   //TrackStats
+   float get_TrackStats(int k)
+        {if(k<6) {return TrackStats[k];} 
+	 else {return -1;}}//Tracker Stat
+   int get_Samples(){return Samples;}  //Number of sample used to calculate PctLive
+   float get_PctADCLive(){return PctADCLive;} //PSOC Live time percentage using N Samples between the last 2 events   
+   float get_PctMaBzy(){return PctMaBzy;}
+   float get_PctTrLive(){return PctTrLive;} 
+
+   //PMHF1 MAIN PSOC HOUSEKEEPING 
+   //PMHF1: 07/19/2022 13:29:16 Date: 07/19/2022 13:29:07 DeltaT: 5716.00 Source: FF00FF LastCmd: 0320 CountCmd: 2 ErrCmd: 0 ErrGen: 12 Missing: 0 FIFOPct: 0 Drop232: 0 DropUSB: 0 
+   int get_yMPHK1(){return yMPHK1;}//Year from PMHF1 line linked to the event
+   int get_mMPHK1(){return mMPHK1;}//Month from PMHF1 line linked to the event
+   int get_dMPHK1(){return dMPHK1;}//Day from PMHF1 line linked to the event
+   int get_hMPHK1(){return hMPHK1;}//Hour from PMHF1 line linked to the event
+   int get_miMPHK1(){return miMPHK1;}//Minute from PMHF1 line linked to the event 
+   int get_sMPHK1(){return sMPHK1;}//Second from PMHF1 line linked to the event
+   int get_yMPHK1b(){return yMPHK1b;}//Year from PMHFb1 line linked to the event
+   int get_mMPHK1b(){return mMPHK1b;}//Month from PMHF1b line linked to the event
+   int get_dMPHK1b(){return dMPHK1b;}//Day from PMHF1b line linked to the event
+   int get_hMPHK1b(){return hMPHK1b;}//Hour from PMHF1b line linked to the event
+   int get_miMPHK1b(){return miMPHK1b;}//Minute from PMHF1b line linked to the event 
+   int get_sMPHK1b(){return sMPHK1b;}//Second from PMHF1b line linked to the event
+   float get_DeltaT(){return DeltaT;}
+   string get_SourceMPHK(){return SourceMPHK;}
+   int get_LastCmdMPHK(){return LastCmdMPHK;}
+   int get_CountCmdMPHK(){return CountCmdMPHK;}
+   int get_ErrCmdMPHK(){return ErrCmdMPHK;}
+   int get_ErrGenMPHK(){return ErrGenMPHK;}
+   int get_MissingMPHK(){return MissingMPHK;}
+   int get_FIFOPctMPHK(){return FIFOPctMPHK;}
+   int get_Drop232MPHK(){return Drop232MPHK;}
+   int get_DropUSBMPHK(){return DropUSBMPHK;}
+    
+   //PMHF2
+   //PMHF2: 07/19/2022 13:29:16 BarCounts: 29028110 149972000 29255638 149731314 BarRates:  -198586.8 -274361.6 -200137.7 -272696.6 400.0 0.00 400.0 0.00
+   float get_P1MPHK(){return P1MPHK;}
+   float get_P2MPHK(){return P2MPHK;}
+   float get_Temp1MPHK(){return Temp1MPHK;} 
+   float get_Temp2MPHK(){return Temp2MPHK;}
+
+   //PMHF3
+   //PMHF3: 07/19/2022 13:29:16 Dp: 2010065 Dt: -2099950 IntPress: 750.24 IntTemp: 42.3 BoardTemp: 43.0 DieTemp: 44.0 Analog: 3.47 147.33 3.32 91.66 5.01 840.30 5.25 4.25 15.24 3.61 2730.47 121.43 
+   int get_yMPHK3(){return yMPHK3;}//Year from PMHF3 line linked to the event
+   int get_mMPHK3(){return mMPHK3;}//Month from PMHF3 line linked to the event
+   int get_dMPHK3(){return dMPHK3;}//Day from PMHF3 line linked to the event
+   int get_hMPHK3(){return hMPHK3;}//Hour from PMHF3 line linked to the event
+   int get_miMPHK3(){return miMPHK3;}//Minute from PMHF3 line linked to the event 
+   int get_sMPHK3(){return sMPHK3;}//Second from PMHF3 line linked to the event
+   int get_Dp(){return Dp;}
+   int get_Dt(){return Dt;}
+   float get_IntPress(){return IntPress;}
+   float get_IntTemp(){return IntTemp;}
+   float get_BoardTemp(){return BoardTemp;}
+   float get_DieTemp(){return DieTemp;}
+   float get_Dig3V(){return Dig3V;}
+   float get_Dig3C(){return Dig3C;}
+   float get_Ana3V(){return Ana3V;}
+   float get_Ana3C(){return Ana3C;}
+   float get_Dig5V(){return Dig5V;}
+   float get_Dig5C(){return Dig5C;}
+   float get_Ana5V(){return Ana5V;}
+   float get_Ana5C(){return Ana5C;}
+   float get_Dig15V(){return Dig15V;}
+   float get_TckV(){return TckV;}
+   float get_TckC(){return TckC;}
+   float get_TckbiasC(){return TckbiasC;}
+   
    int get_yPHA(){return yPHA;}
    int get_mPHA(){return mPHA;}
    int get_dPHA(){return dPHA;}
@@ -567,12 +1116,7 @@ class ALEvent:public TObject
    int get_flagL(int k){if(k<8)return flagL[k];else return 0;}
 
    ////////////////////////////////
-   unsigned  get_Status(){return Status;}
-   bool get_G(){return G;}
-   bool get_TrTrig1(){return TrTrig1;}
-   bool get_TrTrig0(){return TrTrig0;}
-   bool get_PMTTrig2(){return PMTTrig2;}
-   bool get_PMTTrig1(){return PMTTrig1;}
+
    ////////////////////////////////
 
    int get_ncase(){return ncase;}
@@ -663,17 +1207,14 @@ class ALEvent:public TObject
    std::vector<float>&  get_posAge(){return posAge;}
    std::vector<float>&  get_posP(){return posP;}
 
-   bool get_T1(){return T1;}
-   bool get_T2(){return T2;}
-   bool get_T3(){return T3;}
-   bool get_T4(){return T4;}
+
    bool get_guard(){return guard;}
    std::vector<double>&  get_EneT1(){return EneT1;}
    std::vector<double>&  get_EneT2(){return EneT2;}
    std::vector<double>&  get_EneT3(){return EneT3;}
    std::vector<double>&  get_EneT4(){return EneT4;}
    std::vector<double>&  get_Eneg(){return Eneg;}
-   std::vector<double>&  get_PHA6(){return PHA6;}
+   std::vector<double>&  get_ToF(){return ToF;}
 
    std::vector<double>&  get_XT1(){return XT1;}
    std::vector<double>&  get_XT3(){return XT3;}
@@ -760,7 +1301,9 @@ class ALEvent:public TObject
    float get_HeatV(){return HeatV;}
    float get_TrackC(){return TrackC;}
    float get_TrackV(){return TrackV;}
-
+   float get_IntPiV(){return IntPiV;}
+   float get_IntPiC(){return IntPiC;}
+   
    //From VCI line
    int get_yVCI(){return yVCI;}
    int get_mVCI(){return mVCI;}
@@ -769,7 +1312,7 @@ class ALEvent:public TObject
    int get_miVCI(){return miVCI;}
    int get_sVCI(){return sVCI;}
 
-   int get_Lrate(int k){if(k<8)return Lrate[k];else return 0;}
+   //int get_Lrate(int k){if(k<8)return Lrate[k];else return 0;}
 
 
    ////////////////////////////////

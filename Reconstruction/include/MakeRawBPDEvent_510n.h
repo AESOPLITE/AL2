@@ -1,14 +1,10 @@
-#ifndef __ALPATTERNRECOGNITION__
-#define __ALPATTERNRECOGNITION__
+//////////////////////////////////////////////////////////////////////////////////////////
+///    Author: Pierre-Simon Mangeard, psmangeard@gmail.com
+///    Department of Physics and Astronomy, University of Delaware, September 8, 2017
+//////////////////////////////////////////////////////////////////////////////////////////
 
-#include "TNtupleD.h"		  // from ROOT
-#include "TFile.h"			  // from ROOT
-#include "TTree.h"
-#include <iostream>
-#include "TNtupleD.h"		  // from ROOT
-#include "TFile.h"			  // from ROOT
-#include "TTree.h"
-#include "ALEvent.h"
+
+
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -58,25 +54,21 @@
 #include "TRandom3.h"
 #include "TRandom2.h"
 #include "TRandom1.h"
-#include "TVector3.h"
-#include "TSpline.h"
-#include "TMultiGraph.h"
-#include "LoadDataparameters.h"
-#include "LoadMCparameters.h"
-#include "TCollection.h"
-#include "TBox.h"
-#include <sstream>
-#include <bitset>
-#include <string>
-#include "tools.h"
-class ALPatternRecognition {
-	
-public:
-	ALPatternRecognition() {};
-	virtual ~ALPatternRecognition() {};	
-	int FindPattern(ALEvent *re, int DataType, float*,float*,float*,float*);
-	 void FindPatternPSM(ALEvent *re);
-	ClassDef(ALPatternRecognition, 1)
-};
+#include "ALEvent.h"
 
-#endif
+//ClassImp(ALTckhit)
+//ClassImp(ALEvent)
+
+
+
+vector<string> split (string*,char);
+double s2lf(string*);
+float s2f(string*);
+int s2i(string*);
+int Partition(int ,int ,float []);
+void Quick_sort(int ,int ,float []);
+void extractdate(int *y,int*m,int*d,string*str);
+void extracttime(int *h,int*m,int*s,string*str);
+int DecodeASIShort(string data,vector<ALTckhit*>* Hh,int*);
+int DecodeASILong(string data,vector<ALTckhit*>* Hh,int*,int*,int *);
+int MakeRawBPDEventIT(string);
