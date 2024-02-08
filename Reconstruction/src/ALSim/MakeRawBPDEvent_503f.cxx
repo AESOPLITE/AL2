@@ -193,6 +193,7 @@ int MakeRawBPDEventIT(string filename)
     kLine++;
     // if(kLine%1000==0)
     //cout<< "Line " << kLine << " is read" <<endl;
+    //cout<< line <<endl;
 
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "CT1"
@@ -809,7 +810,7 @@ int MakeRawBPDEventIT(string filename)
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "ASI"
 ///////////////////////////////////////////////
-    if (line.compare(0,3,"ASI",3)==0)
+    if (line.compare(0,4,"ASI:",4)==0)
      {
       //cout << "In ASI line" <<endl;
       if (kASI==8) continue;//Skip the ASI lines after 8 lines
@@ -1394,16 +1395,16 @@ int DecodeASILong(string data,vector<ALTckhit*>* Hh,int*Ti,int*Tic,int* Nhitnois
 
        //Flag is 1: Don't use the hit
        int flagN=0;
-       if(L==4&&firstStripNumber==357&&Nstrip<=1)flagN=1;
-       if(L==4&&firstStripNumber==358&&Nstrip==0)flagN=1;
+       //if(L==4&&firstStripNumber==357&&Nstrip<=1)flagN=1;
+       //if(L==4&&firstStripNumber==358&&Nstrip==0)flagN=1;
 
        //Mask of bad strips
        for(int k=0;k<Nstrip+1;k++)
          {
           //For flight configuration 2018
 	        int tmpstrip=firstStripNumber+k;
-          if(L==4&&tmpstrip==357){tmpH->set_noisy(1);}
-          if(L==4&&tmpstrip==358){tmpH->set_noisy(1);}
+          //if(L==4&&tmpstrip==357){tmpH->set_noisy(1);}
+          //if(L==4&&tmpstrip==358){tmpH->set_noisy(1);}
          }
 
        //Fill up the vector

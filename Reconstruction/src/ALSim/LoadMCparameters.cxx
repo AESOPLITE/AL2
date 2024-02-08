@@ -14,12 +14,13 @@ void LoadMCparameters(string filename,int*TckReg,int*TrigReg,int*GReg, float*Tck
 //Then the shell and insulation
 
  //Number of lines in the file
- int n=15;
+ int n=16;
  //Prefix 5 character
- string pre[15]={"TckL1","TckL2","TckL3","TckL4","TckL5","TckL6","TckL7","TckL8","Trig1","Trig2","Trig3","Trig4","Guard","Isofoam","Shell"};
+ string pre[16]={"TckL1","TckL2","TckL3","TckL4","TckL5","TckL6","TckL7","TckL8","Trig1","Trig2","Trig3","Trig4","Guard","Isofoam","Shell","Win"};
 
  //Create stream from filename
  ifstream file;
+ //cout << "Filename of MC param is: " << filename << endl;
  file.open(filename, ios_base::in); // open file
  int j=0;
  for(string line; getline(file, line); )   //read stream line by line
@@ -30,20 +31,20 @@ void LoadMCparameters(string filename,int*TckReg,int*TrigReg,int*GReg, float*Tck
     in >> prefix;                  //and read the first whitespace-separated token
     int tmp;
     in >> tmp;
-	  float val;
-	  in >> val;
+    float val;
+    in >> val;
     //check prefix to load the appropriate region variable
     for(int i=0;i<n;i++)
       {
        if(prefix.compare(pre[i]) == 0)
         {
          if(i<8) {TckReg[i]=tmp;TckZPos[i]=val;j++;}
-	       else if(i<8+4) {TrigReg[i-8]=tmp;TrigThresh[i-8]=val;j++;}
-	       else if(i==8+4) {GReg[0]=tmp;GuardThresh[0]=val;j++;}
+         else if(i<8+4) {TrigReg[i-8]=tmp;TrigThresh[i-8]=val;j++;}
+         else if(i==8+4) {GReg[0]=tmp;GuardThresh[0]=val;j++;}
          else if(i>12)  {ShellReg[i-13]=tmp;j++;}
         }//if
       }//i
    }//line
 //	cout << "In LoadMCParameters, isofoam region: " << ShellReg[0] <<", shell region: " << ShellReg[1] << endl;
-  if (j!=n) cout << "Error when loading the MC parameters: Wrong number of parameters in the file " << filename << endl;
+  if (j!=n) cout << "Error when loading the MC parameters: Wrong number of parameters in the file " << filename << "; j=" <<j << ", n=" << n  <<endl;
 }

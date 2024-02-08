@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 
 #include "MakeEventData.h"
-#include "MakeRawBPDEvent_503f.h"
+#include "MakeRawBPDEvent_511d.h"
 #include "ALPatternRecognition.h"
 #include "LoadDataparameters.h"
 #include "TBox.h"
@@ -126,6 +126,8 @@ int MakeEventData(string filename,int geoconfig,float* zL,float* OffsetLL,float*
     NLNB+=(int)((Ti >>0) & 0x01);
     NLNB+=(int)((Ti >>5) & 0x01);
     NLNB+=(int)((Ti >>7) & 0x01);
+ 
+    
 
     //loop over the number of clusters
     int nnhits = (int)de->get_Nhits();
@@ -210,9 +212,12 @@ int MakeEventData(string filename,int geoconfig,float* zL,float* OffsetLL,float*
    int DataType = 1;
    ALPatternRecognition* PR = new ALPatternRecognition();
    int EventPR = PR->FindPattern(de,DataType,zL,OffsetLL,OffsetRL,TrigThresh);
-   cout << "Event " << k <<", NL = " << NL << " After PR, EventPR: " << EventPR << endl;
-   
-   if(EventPR==0) {
+   //cout << "Event " << k <<", NL = " << NL << " After PR, EventPR: " << EventPR << endl;
+   double deflecPR = de->get_deflecPR(); 
+   //cout << "NLNB:" << NLNB <<endl;
+   //cout << "NLB:" << NLB <<endl;
+   //cout << "deflec " << deflecPR <<endl;
+   if(deflecPR==0 || NLNB<2 || NLB<3) {
          DEtree->Fill();
       //Free memory
       delete de;
@@ -329,7 +334,7 @@ int MakeEventData(string filename,int geoconfig,float* zL,float* OffsetLL,float*
             double yPR=(de->get_hits().at(j)->get_yPR())*10.;        //in mm
             double zPR=(de->get_hits().at(j)->get_zPR())*10.;        //in mm
             //Fill in hits informations onto TkrData class
-            if (L==7 && fstripID==575 &&nstrip==1) xx = xPR;
+            //if (L==7 && fstripID==575 &&nstrip==1) xx = xPR;
             if(L==0||L==5||L==7) Td->addHit(L,xx, nstrip, xx, yy, xPR, yPR);
             else Td->addHit(L,yy, nstrip, xx, yy, xPR, yPR);
             cout  << k << ", l=" << L <<", x= " << xx << " ,xPR=" << xPR << " y= " << yy << ", yPR " << yPR << " z= " << zz << ", zPR " << zPR << endl;

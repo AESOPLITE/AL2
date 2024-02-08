@@ -3,329 +3,7 @@
 ///    Department of Physics and Astronomy, University of Delaware, September 8, 2017
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MakeRawBPDEvent.h"
-
-int MakeRawBPDEvent(string filename)
-{
- //Get input filename and ASIC Length
- vector<string> input;
- //Split the line
- input=split(&filename,' ');
- int ASILength =stoi(input.at(1));
- int EVTLength =stoi(input.at(2));
- //Open input file
- ifstream filestr;
- filestr.open(input.at(0));
- if(!filestr.is_open())
-  {
-   cout << "The file " <<input.at(0) << " is not open ... "<< endl ;
-   return -1;
-  }
-
-
-
-
- //Load configuration parameter
-/* int*TckReg=new int[7];
- int*TrigReg=new int[4];
- int*GReg=new int[1];for(int i=0;i<1;i++)GReg[i]=0;
- for(int i=0;i<7;i++)TckReg[i]=0;
- for(int i=0;i<4;i++)TrigReg[i]=0;
- for(int i=0;i<1;i++)GReg[i]=0;
- string MCparamfile="../src/ALSim/MCparameters.dat";
-
- LoadMCparameters(MCparamfile,TckReg,TrigReg,GReg);
-*/
-
- //Output root file
- TFile*fileout=new TFile(Form("%s.root",input.at(0).c_str()),"RECREATE");
- cout << "Output file is created" <<endl;
-
- // Create a TTree
- TTree *tree = new TTree("BPD","BPD Raw event");
- ALEvent *e = new ALEvent();
-
- // Create a branch with event
- tree->Branch("event",&e);
-
-//Temporary variable for internal triggers
- int*Titmp=new int[7];
- for (int i=0;i<7;i++)Titmp[i]=0;
- int*Tictmp=new int[7];
- for (int i=0;i<7;i++)Tictmp[i]=0;
-
- int nL=0;
- int iL=0;
- vector<ALTckhit*> Hh;
-
-
-///////////////////////////////////////////////
-//Define variables needed during the reading of the file
-///////////////////////////////////////////////
-
- //Line number
- int kLine=0;
- //Event number
- int kEvent=0;
-
- //vector of the last "PHA" lines
- vector <string> prevPHAline;
- //Number of "PHA" lines kept in memory
- int NPHAMem=5;
- //Last "EVT" lines
- string prevEVTline;
-
- //number of words per line
- //int NPHAwords=13; //PHA line for MIPFlit3.30
- //int NPHAwords=11; //PHA line for MIPFlit3.31
- int NPHAwords=12; //PHA line for MIPFlit3.72
- int NEVTwords=0;
- if(EVTLength==0)  NEVTwords=4; //EVT line from MIPFlit3.30 to 3.35
- if(EVTLength==1)  NEVTwords=16; //Was increased at the same time of ASIC Length
- if(EVTLength==2)  NEVTwords=18; //Was increased at the same time of ASIC Length from NL0155
- int NASIwords= 4; //ASI line
-
-
-//Number of Layers read
- int kASI=0;
-
-//Start to read the file
- for (string line; getline(filestr,line);)
-   {
-   // if(kEvent>3) return -1;
-    //Here the full line is read and stored in the string object "line"
-    kLine++;
-    //if(kLine%1000==0)
-    //      cout<< "Line " << kLine << " is read" <<endl;
-///////////////////////////////////////////////
-//Compare the first 3 char of the line to "PHA"
-///////////////////////////////////////////////
-
-    if (line.compare(0,3,"PHA",3)==0)
-     {
-      //cout << "In PHA line" <<endl;
-      //Each PHA Line creates one event
-      //If not the first PHA Line fill the previous event in the tree
-      if(kEvent!=0)
-       {
-        int t=0;
-        int tc=0;
-        for (int ij=0;ij<7;ij++) t+=Titmp[ij]*(int)TMath::Power(2,ij);
-        for (int ij=0;ij<7;ij++) tc+=Tictmp[ij]*(int)TMath::Power(2,ij);
-        e->set_Ti(t);
-        e->set_Tic(tc);
-        tree->Fill();
-        //reset event
-        delete e;
-       }
-
-      //Define new event
-      e=new ALEvent();
-      //Increment the number of read events
-      kEvent++;
-      e->set_eventnumber(kEvent);
-
-      //Define internal tracker trigger
-      Titmp=new int[7];
-      for(int ij=0;ij<7;ij++)Titmp[ij]=0;
-      Tictmp=new int[7];
-      for(int ij=0;ij<7;ij++)Tictmp[ij]=0;
-      ///////////////////////////////////////////////
-      //Extract the data from the last PHA line
-      ///////////////////////////////////////////////
-      vector<string> datalinePHA;
-
-      //Split the line
-      datalinePHA=split(&line,' ');
-
-      if((int)datalinePHA.size()!=NPHAwords)
-        {
-         cout << "Number of words in the PHA line is wrong : " << (int)datalinePHA.size() << " (Should be " << NPHAwords  << "): "<< endl;
-         cout << line <<endl;
-         continue;
-        }
-      int year=0;
-      int month=0;
-      int day=0;
-      int hour=0;
-      int minute=0;
-      int second=0;
-
-      //Extract PHA date
-      year=month=day=0;
-      //cout << "extract PHA date" <<endl;
-      //cout << dataline.at(1) <<endl;
-      extractdate(&year,&month,&day,&datalinePHA.at(1));
-      //cout << "extract PHA date is done" <<endl;
-      //Extract PHA time
-      hour=minute=second=0;
-      //cout << "extract PHA time" <<endl;
-      extracttime(&hour,&minute,&second,&datalinePHA.at(2));
-      //cout << "extract PHA time is done" <<endl;
-      //Fill the event structure with PHA time variables
-      e->set_yPHA(year);
-      e->set_mPHA(month);
-      e->set_dPHA(day);
-      e->set_hPHA(hour);
-      e->set_miPHA(minute);
-      e->set_sPHA(second);
-      //cout << "PHA time was added to the event" <<endl;
-      //Fill the trigger information from the PHA line
-      e->add_EneT1(s2lf(&datalinePHA.at(3)));
-      e->add_EneT2(s2lf(&datalinePHA.at(4)));
-      e->add_EneT3(s2lf(&datalinePHA.at(5)));
-      e->add_EneT4(s2lf(&datalinePHA.at(6)));
-      e->add_Eneg(s2lf(&datalinePHA.at(7)));
-      e->add_PHA6(s2lf(&datalinePHA.at(8)));
-      e->set_GoPHA(s2lf(&datalinePHA.at(9)));
-      e->set_tPHA(s2lf(&datalinePHA.at(10)));
-     }//end read line starting with PHA
-
-///////////////////////////////////////////////
-//Compare the first 3 char of the line to "EVT"
-///////////////////////////////////////////////
-    if (line.compare(0,3,"EVT",3)==0)
-     {
-      //cout << "In EVT line" <<endl;
-      //An EVT line is always associated to the previous PHA line
-      //If several EVT lines follow one PHA line then the last EVT line is recorded
-      ///////////////////////////////////////////////
-      //Extract the data from the EVT line
-      ///////////////////////////////////////////////
-      vector<string> datalineEVT;
-
-      //Split the line
-      datalineEVT=split(&line,' ');
-      if((int)datalineEVT.size()!=NEVTwords)
-       {
-        cout << "Number of words in the EVT line is wrong : " << (int)datalineEVT.size() << " (Should be " << NEVTwords  << "): "<< endl;
-        cout << line <<endl;
-       }
-      int year=0;
-      int month=0;
-      int day=0;
-      int hour=0;
-      int minute=0;
-      int second=0;
-      //Extract EVT date
-      //cout << "extract EVT date" <<endl;
-      //cout << dataline.at(1) <<endl;
-      extractdate(&year,&month,&day,&datalineEVT.at(1));
-      //cout << "extract EVT date is done" <<endl;
-      //Extract PHA time
-      hour=minute=second=0;
-      //cout << "extract EVT time" <<endl;
-      extracttime(&hour,&minute,&second,&datalineEVT.at(2));
-      //cout << "extract EVT time is done" <<endl;
-      //Fill the event structure with EVT time variables
-      e->set_yEVT(year);
-      e->set_mEVT(month);
-      e->set_dEVT(day);
-      e->set_hEVT(hour);
-      e->set_miEVT(minute);
-      e->set_sEVT(second);
-      //cout << "EVT time was added to the event" <<endl;
-      //Fill data
-      e->set_EVT(datalineEVT.at(3));
-      if(EVTLength==1)
-       {
-        e->set_GoEVT(s2lf(&datalineEVT.at(11)));
-        e->set_tEVT(s2lf(&datalineEVT.at(13)));
-       }
-      if(EVTLength==2)
-       {
-        e->set_nHitLEVT(s2i(&datalineEVT.at(5)));
-        e->set_CCEVT(s2i(&datalineEVT.at(7)));
-        e->set_PatternEVT(s2i(&datalineEVT.at(9)));
-        e->set_Q1EVT(s2i(&datalineEVT.at(11)));
-        e->set_GoEVT(s2lf(&datalineEVT.at(13)));
-        e->set_tEVT(s2lf(&datalineEVT.at(15)));
-        e->set_TrigEVT(s2lf(&datalineEVT.at(17)));
-       }
-
-      // cout << "EVT data was added to the event" <<endl;
-     }//end read line starting with EVT
-
-///////////////////////////////////////////////
-//Compare the first 3 char of the line to "ASI"
-///////////////////////////////////////////////
-    if (line.compare(0,3,"ASI",3)==0)
-     {
-      //cout << "In ASI line" <<endl;
-      //Define vector of string "dataline"
-      //The vector will contains the words of the line
-      vector<string> dataline;
-      dataline=split(&line,' '); //split the line in a vector of words
-
-      if((int)dataline.size()!=NASIwords)
-       {
-        cout << "Number of words in the ASI line is wrong : " << (int)dataline.size() << " (Should be " << NASIwords  << "): "<< endl;
-        cout << line <<endl;
-        return -1;
-       }
-
-      //Extract ASI date
-      int yearASI=0;
-      int monthASI=0;
-      int dayASI=0;
-      //cout << "extract ASI date" <<endl;
-      //cout << dataline.at(1) <<endl;
-      extractdate(&yearASI,&monthASI,&dayASI,&dataline.at(1));
-      //cout << "extract ASI date is done" <<endl;
-      //Extract ASI time
-      int hourASI=0;
-      int minuteASI=0;
-      int secondASI=0;
-      //cout << "extract ASI time" <<endl;
-      extracttime(&hourASI,&minuteASI,&secondASI,&dataline.at(2));
-      //cout << "extract ASI time is done" <<endl;
-
-      //Decode ASIC code
-      if(ASILength==0)DecodeASIShort(dataline.at(3),&Hh,Titmp);
-      int n=0;
-      if(ASILength==1)DecodeASILong(dataline.at(3),&Hh,Titmp,Tictmp,&n);
-
-      for(int ij=0;ij<(int)Hh.size();ij++)
-        {
-         //e->set_L(Hh.at(ij)->getL(),dataline.at(3));
-         e->set_flagL(Hh.at(ij)->get_L(),1);
-         Hh.at(ij)->set_year(yearASI);
-         Hh.at(ij)->set_m(monthASI);
-         Hh.at(ij)->set_d(dayASI);
-         Hh.at(ij)->set_hour(hourASI);
-         Hh.at(ij)->set_mi(minuteASI);
-         Hh.at(ij)->set_s(minuteASI);
-         e->add_hit(Hh.at(ij));
-        }
-      //Clear hits
-      Hh.clear();
-     }//end read line starting with ASI
-   }//end read file
-
-
- //Fill last event
- int t=0;
- int tc=0;
- for (int ij=0;ij<7;ij++) t+=Titmp[ij]*(int)TMath::Power(2,ij);
- for (int ij=0;ij<7;ij++) tc+=Tictmp[ij]*(int)TMath::Power(2,ij);
- e->set_Ti(t);
- e->set_Tic(tc);
- tree->Fill();
- //reset event
- delete e;
-
-
- //Write tree in output file
- tree->Write(0,TObject::kOverwrite);
-
- //Close the file
- filestr.close();
- cout << "The file "<<filename  << " is closed"<< endl;
- fileout->Close();
- cout << "The output file "<<Form("%s.root",input.at(0).c_str())  << " is closed"<< endl;
-
- return 0;
-}
+#include "MakeRawBPDEvent_510g.h"
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +12,7 @@ int MakeRawBPDEvent(string filename)
 int MakeRawBPDEventIT(string filename)
 {
 
-  cout << "In MakeRawBPDEvent"  <<endl;
+  cout << "In MakeRawBPDEventIT"  <<endl;
 
 
  //Get input filename and ASIC Length and EVT Length
@@ -364,10 +42,10 @@ int MakeRawBPDEventIT(string filename)
  tree->Branch("event",&e);
 
 //Temporary variable for internal triggers
- int*Titmp=new int[7];
- for (int i=0;i<7;i++)Titmp[i]=0;
- int*Tictmp=new int[7];
- for (int i=0;i<7;i++)Tictmp[i]=0;
+ int*Titmp=new int[8];
+ for (int i=0;i<8;i++)Titmp[i]=0;
+ int*Tictmp=new int[8];
+ for (int i=0;i<8;i++)Tictmp[i]=0;
 
  int nL=0;
  int iL=0;
@@ -383,7 +61,7 @@ int MakeRawBPDEventIT(string filename)
  //Event number
  int kEvent=0;
 
- //vector of the last "PHA" lines
+ //vector of the last "PHA" lines: NOW SPE1
  vector <string> prevPHAline;
  //Number of "PHA" lines kept in memory
  int NPHAMem=5;
@@ -474,8 +152,8 @@ int MakeRawBPDEventIT(string filename)
  int hVCI=-1;
  int miVCI=-1;
  int sVCI=-1;
- int* LrVCI=new int[7];
- for (int ijk=0;ijk<7;ijk++)LrVCI[ijk]=0;
+ int* LrVCI=new int[8];
+ for (int ijk=0;ijk<8;ijk++)LrVCI[ijk]=0;
 
  int NCT1words=25; //CT1 line
  int NCT3words=21; //CT3 line
@@ -486,7 +164,9 @@ int MakeRawBPDEventIT(string filename)
  //int NPHAwords=13; //PHA line for MIPFlit3.30
  //int NPHAwords=11; //PHA line for MIPFlit3.31
  int NPHAwords=12; //PHA line for MIPFlit3.72
-
+ 
+ int NPSE1words=39;  //SPE1 line MPIFLit 5.03e, 5.03f
+ 
  int NEVTwords=0;
  if(EVTLength==0)  NEVTwords=4; //EVT line from MIPFlit3.30 to 3.35
  if(EVTLength==1)  NEVTwords=16; //Was increased at the same time of ASIC Length
@@ -498,6 +178,7 @@ int MakeRawBPDEventIT(string filename)
  int kASI=0;
  int kEVT=0;
  int kPHA=0;
+ int kPSE1=0;
  int flagGoodGo=0;
  int NoisyClus=0;
 
@@ -511,13 +192,14 @@ int MakeRawBPDEventIT(string filename)
 
     kLine++;
     // if(kLine%1000==0)
-    //  cout<< "Line " << kLine << " is read" <<endl;
+    //cout<< "Line " << kLine << " is read" <<endl;
+    //cout<< line <<endl;
 
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "CT1"
 ///////////////////////////////////////////////
 
-    if (line.compare(0,3,"CT1",3)==0)
+ /*   if (line.compare(0,3,"CT1",3)==0)
      {
       ///////////////////////////////////////////////
       //Extract the data from the last CT1 line
@@ -525,7 +207,6 @@ int MakeRawBPDEventIT(string filename)
       vector<string> datalineCT1;
       //Split the line
       datalineCT1=split(&line,' ');
-
       if((int)datalineCT1.size()!=NCT1words)
         {
          cout << "Number of words in the CT1 line is wrong : " << (int)datalineCT1.size() << " (Should be " << NCT1words  << "): "<< endl;
@@ -542,7 +223,7 @@ int MakeRawBPDEventIT(string filename)
 
       //Format from Paul's email of Feb. 8, 2018
 
-      OnTimeCT1=s2i(&datalineCT1.at(3));
+      OnTimeCT1=s2i(&datalineCT1.at(3));MakeRawBPDEvent_503f.cxx
       LastCT1=s2i(&datalineCT1.at(4));
       CountCT1= s2i(&datalineCT1.at(5));
       Baro1T=s2f(&datalineCT1.at(8));
@@ -559,10 +240,11 @@ int MakeRawBPDEventIT(string filename)
       Volt5VCT1=s2f(&datalineCT1.at(21));
       Volt15VCT1=s2f(&datalineCT1.at(22));
      }
+ */    
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "CT3"
 ///////////////////////////////////////////////
-
+/*
     if (line.compare(0,3,"CT3",3)==0)
      {
       ///////////////////////////////////////////////
@@ -607,10 +289,11 @@ int MakeRawBPDEventIT(string filename)
       Volt15VCT3=s2f(&datalineCT3.at(18));
 
      }
+     */
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "POW"
 ///////////////////////////////////////////////
-
+/*
     if (line.compare(0,3,"POW",3)==0)
      {
       ///////////////////////////////////////////////
@@ -645,11 +328,11 @@ int MakeRawBPDEventIT(string filename)
       TrackV=s2f(&datalinePOW.at(8));
       TrackC=s2f(&datalinePOW.at(9));
      }
-
+*/
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "VCI"
 ///////////////////////////////////////////////
-
+/*
     if (line.compare(0,3,"VCI",3)==0)
      {
       ///////////////////////////////////////////////
@@ -678,12 +361,12 @@ int MakeRawBPDEventIT(string filename)
       for(int ijk=0;ijk<7;ijk++) LrVCI[ijk]=s2i(&datalineVCI.at(19+ijk));
 
      }
-
+*/
 
 ///////////////////////////////////////////////
-//Compare the first 3 char of the line to "PHA"
+//Compare the first 3 char of the line to "PHA" 
 ///////////////////////////////////////////////
-
+/*
     if (line.compare(0,3,"PHA",3)==0)
      {
       //cout << "In PHA line" <<endl;
@@ -845,13 +528,200 @@ int MakeRawBPDEventIT(string filename)
       e->set_sVCI(sVCI);
 
       for(int ijk=0;ijk<7;ijk++)  e->set_Lrate(ijk,LrVCI[ijk]);
-
+     
      }//end read line starting with PHA
+*/
+///////////////////////////////////////////////
+//Compare the first 4 char of the line to "PSE1" 
+///////////////////////////////////////////////
+    
+    if (line.compare(0,4,"PSE1",4)==0)
+     {
+      //cout << line <<endl;
+      //MIPFLIT 5.03f
+      //  0       1        2      3   4    5    6  7  8   9   10 11       12       13  14   15     16   17  18     19  20 21      22         23   24        25    26   27  28   29   30    31   32   33   34  35   36   37   38                                                                                                                                                                  
+      //PSE1: 01/04/2022 16:09:19 N: 141 Type: 221 X: 0 Last: 48 ZERO FirstNibble: 15 Run: 1536 Trigger: 1 Stamp: 776 Go1: 1 Date/Time: 28_01_01 00:29:14 Status: 29 PHA0: 438 PHA1: 120 PHA2: 155 PHA3: 508 PHA4: 568 PHA5: 228
+      //  0       1        2      3   4    5    6  7  8   9   10 11       12       13     14       15    16      17  18     19      20  21   22         23      24      25         26  27  28   29   30    31   32   33   34  35   36   37   38     39                                                                                                                                                                  
+      //PSE1: 01/04/2022 17:01:44 N: 220 Type: 221 X: 0 Last: 75 ZERO FirstNibble: 15 ***Strange  Run: 1536 Trigger: 3022 Stamp: 629085 Go1: 3058 Date/Time: 28_01_01 01:21:39 Status: 29 PHA0: 665 PHA1: 120 PHA2: 957 PHA3: 4064 PHA4: 4076 PHA5: -60
+            
+      //cout << "In PSE1 line" <<endl;
+      //Each PSE1 Line creates one event
+      //If not the first PSE1 Line fill the previous event in the tree
+      if(kEvent!=0)
+       {
+        int t=0;
+        int tc=0;
+        for (int ij=0;ij<8;ij++) t+=Titmp[ij]*(int)TMath::Power(2,ij);
+        for (int ij=0;ij<8;ij++) tc+=Tictmp[ij]*(int)TMath::Power(2,ij);
+        e->set_Nhnoisy(NoisyClus);
+        e->set_Ti(t);
+        e->set_Tic(tc);
+        tree->Fill();
+        //reset event
+        kEVT=0;
+        kASI=0;
+        kPSE1=0;
+        flagGoodGo=0;
+        NoisyClus=0;
+        delete e;
+       }
+
+      //Define new event
+      e=new ALEvent();       
+
+      //Increment the number of read events
+      kEvent++;
+      kPSE1=1;
+      e->set_eventnumber(kEvent);
+
+      //Define internal tracker trigger
+      Titmp=new int[8];
+      for(int ij=0;ij<8;ij++)Titmp[ij]=0;
+      Tictmp=new int[8];
+      for(int ij=0;ij<8;ij++)Tictmp[ij]=0;
+      ///////////////////////////////////////////////
+      //Extract the data from the last PSE1 line
+      ///////////////////////////////////////////////
+      vector<string> datalinePSE1;
+
+      //Split the line
+      datalinePSE1=split(&line,' ');
+      if((int)datalinePSE1.size()!=NPSE1words)
+        {
+         cout << "Number of words in the PSE1 line is wrong : " << (int)datalinePSE1.size() << " (Should be " << NPSE1words  << "): "<< endl;
+         cout << line <<endl;
+         e->add_EneT1(-1);
+         e->add_EneT2(-1);
+         e->add_EneT3(-1);
+         e->add_EneT4(-1);
+         e->add_Eneg(-1);
+         e->add_PHA6(-1);
+         continue;
+        }
+              
+      int year=0;
+      int month=0;
+      int day=0;
+      int hour=0;
+      int minute=0;
+      int second=0;
+      //flagGoodGo=1;
+      e->set_runnumber(s2lf(&datalinePSE1.at(15)));
+
+      //Extract PHA date
+      year=month=day=0;
+      //cout << "extract PHA date" <<endl;
+      //cout << dataline.at(1) <<endl;
+      extractdate(&year,&month,&day,&datalinePSE1.at(1));
+      //cout << "extract PHA date is done" <<endl;
+      //Extract PHA time
+      hour=minute=second=0;
+      //cout << "extract PHA time" <<endl;
+      extracttime(&hour,&minute,&second,&datalinePSE1.at(2));
+      //cout << "extract PHA time is done" <<endl;
+      //Fill the event structure with PHA time variables
+      e->set_yPHA(year);
+      e->set_mPHA(month);
+      e->set_dPHA(day);
+      e->set_hPHA(hour);
+      e->set_miPHA(minute);
+      e->set_sPHA(second);
+      //cout << "PHA time was added to the event" <<endl;
+      //Fill the trigger information from the PHA line
+      //cout << datalinePSE1.at(26) << " " << s2i(&datalinePSE1.at(26)) << " "  <<  unsigned(s2i(&datalinePSE1.at(26))) << endl;
+      e->set_Status(unsigned(s2i(&datalinePSE1.at(26))));
+      e->add_EneT1(s2lf(&datalinePSE1.at(28)));
+      e->add_EneT2(s2lf(&datalinePSE1.at(30)));
+      e->add_EneT3(s2lf(&datalinePSE1.at(32)));
+      e->add_EneT4(s2lf(&datalinePSE1.at(34)));
+      e->add_Eneg(s2lf(&datalinePSE1.at(36)));
+      e->add_PHA6(s2lf(&datalinePSE1.at(38)));
+      e->set_GoPHA(s2lf(&datalinePSE1.at(21)));
+      e->set_tPHA(s2lf(&datalinePSE1.at(17)));
+
+      /*
+      //Set the housekeeping variables (It can be defautl value at the beginning of a run)
+      //CT1
+      e->set_yCT1(yCT1);
+      e->set_mCT1(mCT1);
+      e->set_dCT1(dCT1);
+      e->set_hCT1(hCT1);
+      e->set_miCT1(miCT1);
+      e->set_sCT1(sCT1);
+      e->set_OnTimeCT1(OnTimeCT1);
+      e->set_LastCT1(LastCT1);
+      e->set_CountCT1(CountCT1);      e=new ALEvent();
+
+      e->set_TempCT1(TempCT1);
+      e->set_Volt5VCT1(Volt5VCT1);
+      e->set_Volt15VCT1(Volt15VCT1);
+      e->set_Baro1T(Baro1T);
+      e->set_Baro1P(Baro1P);
+      e->set_Baro2T(Baro2T);
+      e->set_Baro2P(Baro2P);
+      e->set_GOCT1(GOCT1);
+      e->set_coinCT1(coinCT1);
+      e->set_PressB1(PressB1);
+      e->set_TempB1(TempB1);
+      e->set_PressB2(PressB2);
+      e->set_TempB2(TempB2);
+
+
+      //CT3
+      e->set_yCT3(yCT3);
+      e->set_mCT3(mCT3);
+      e->set_dCT3(dCT3);
+      e->set_hCT3(hCT3);
+      e->set_miCT3(miCT3);
+      e->set_sCT3(sCT3);
+      e->set_OnTimeCT3(OnTimeCT3);
+      e->set_LastCT3(LastCT3);
+      e->set_CountCT3(CountCT3);
+      e->set_TempCT3(TempCT3);
+      e->set_Volt5VCT3(Volt5VCT3);
+      e->set_Volt15VCT3(Volt15VCT3);
+      e->set_T1L(T1L);
+      e->set_T1A(T1A);
+      e->set_T2L(T2L);
+      e->set_T2A(T2A);
+      e->set_T3L(T3L);
+      e->set_T3A(T3A);
+      e->set_T4L(T4L);
+      e->set_T4A(T4A);
+      e->set_GRDL(GRDL);
+      e->set_GRDA(GRDA);
+
+      //POW
+      e->set_yPOW(yPOW);
+      e->set_mPOW(mPOW);
+      e->set_dPOW(dPOW);
+      e->set_hPOW(hPOW);
+      e->set_miPOW(miPOW);
+      e->set_sPOW(sPOW);
+      e->set_OnTimePOW(OnTimePOW);
+      e->set_MainC(MainC);
+      e->set_MainV(MainV);
+      e->set_HeatC(HeatC);
+      e->set_HeatV(HeatV);
+      e->set_TrackC(TrackC);
+      e->set_TrackV(TrackV);
+
+      //VCI
+      e->set_yVCI(yVCI);
+      e->set_mVCI(mVCI);
+      e->set_dVCI(dVCI);
+      e->set_hVCI(hVCI);
+      e->set_miVCI(miVCI);
+      e->set_sVCI(sVCI);
+      
+      for(int ijk=0;ijk<8;ijk++)  e->set_Lrate(ijk,LrVCI[ijk]);
+      */
+     }//end read line starting with SPE1
 
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "EVT"
 ///////////////////////////////////////////////
-    if (line.compare(0,3,"EVT",3)==0)
+/*    if (line.compare(0,3,"EVT",3)==0)
      {
      // cout << "In EVT line" <<endl;
 
@@ -936,14 +806,14 @@ int MakeRawBPDEventIT(string filename)
         //cout << "GoEVT "<<s2f(&datalineEVT.at(11)) << endl;
       // cout << "EVT data was added to the event" <<endl;
      }//end read line starting with EVT
-
+*/
 ///////////////////////////////////////////////
 //Compare the first 3 char of the line to "ASI"
 ///////////////////////////////////////////////
-    if (line.compare(0,3,"ASI",3)==0)
+    if (line.compare(0,4,"ASI:",4)==0)
      {
       //cout << "In ASI line" <<endl;
-      if (kASI==7) continue;//Skip the ASI lines after 7 lines
+      if (kASI==8) continue;//Skip the ASI lines after 8 lines
       //Define vector of string "dataline"
       //The vector will contains the words of the line
       vector<string> dataline;
@@ -955,8 +825,14 @@ int MakeRawBPDEventIT(string filename)
         cout << line <<endl;
         return -1;
        }
-      if(kPHA!=1)continue;
-      if(flagGoodGo==0) continue;
+      
+      //cout << line <<endl;
+      //cout <<kPSE1<< endl;
+      if(kPSE1!=1)continue;
+      //cout <<'Before flagGoodGo'<< endl;
+
+      //if(flagGoodGo==0) continue;
+      //cout << "after  flagGoodGo" <<endl;
       //Extract ASI date
       int yearASI=0;
       int monthASI=0;
@@ -996,14 +872,15 @@ int MakeRawBPDEventIT(string filename)
       //Clear hits
       Hh.clear();
      }//end read line starting with ASI
+    
    }//end read file
 
 
  //Fill last event
  int t=0;
  int tc=0;
- for (int ij=0;ij<7;ij++) t+=Titmp[ij]*(int)TMath::Power(2,ij);
- for (int ij=0;ij<7;ij++) tc+=Tictmp[ij]*(int)TMath::Power(2,ij);
+ for (int ij=0;ij<8;ij++) t+=Titmp[ij]*(int)TMath::Power(2,ij);
+ for (int ij=0;ij<8;ij++) tc+=Tictmp[ij]*(int)TMath::Power(2,ij);
  e->set_Nhnoisy(NoisyClus);
  e->set_Ti(t);
  e->set_Tic(tc);
@@ -1314,11 +1191,11 @@ int DecodeASILong(string data,vector<ALTckhit*>* Hh,int*Ti,int*Tic,int* Nhitnois
  //cout << " ASI Data: " << data <<endl;
  if((datalength-9)%3!=0)
   {
-   cout << "The length of the data string does not pass the requirement: (datalength-9)%3==0 : Length=" <<datalength <<endl;
-   cout << data <<endl;
+   //cout << "The length of the data string does not pass the requirement: (datalength-9)%3==0 : Length=" <<datalength <<endl;
+   //cout << data <<endl;
    //for(int i=0;i<data.size();i++)
    //    cout << data[i]<<endl;
-   cout << "No hit is added"<< endl;
+   //cout << "No hit is added"<< endl;
    return 0;
   }
 
@@ -1343,16 +1220,18 @@ int DecodeASILong(string data,vector<ALTckhit*>* Hh,int*Ti,int*Tic,int* Nhitnois
  int LL=0;
  int L=0;
  LL=stoi(FPGAadd,0,16);
-//Convert FPGA address to Layer number from 1 to 7
+//Convert FPGA address to Layer number
  switch(LL)
   {
    case 8: L=0;break;
+   case 0: L=0;break;
    case 1: L=1;break;
    case 2: L=2;break;
    case 3: L=3;break;
    case 4: L=4;break;
    case 5: L=5;break;
    case 6: L=6;break;
+   case 7: L=7;break;
   }//switch
   //cout << "Layer: " << L <<endl;
 
@@ -1516,16 +1395,16 @@ int DecodeASILong(string data,vector<ALTckhit*>* Hh,int*Ti,int*Tic,int* Nhitnois
 
        //Flag is 1: Don't use the hit
        int flagN=0;
-       if(L==4&&firstStripNumber==357&&Nstrip<=1)flagN=1;
-       if(L==4&&firstStripNumber==358&&Nstrip==0)flagN=1;
+       //if(L==4&&firstStripNumber==357&&Nstrip<=1)flagN=1;
+       //if(L==4&&firstStripNumber==358&&Nstrip==0)flagN=1;
 
        //Mask of bad strips
        for(int k=0;k<Nstrip+1;k++)
          {
           //For flight configuration 2018
 	        int tmpstrip=firstStripNumber+k;
-          if(L==4&&tmpstrip==357){tmpH->set_noisy(1);}
-          if(L==4&&tmpstrip==358){tmpH->set_noisy(1);}
+          //if(L==4&&tmpstrip==357){tmpH->set_noisy(1);}
+          //if(L==4&&tmpstrip==358){tmpH->set_noisy(1);}
          }
 
        //Fill up the vector

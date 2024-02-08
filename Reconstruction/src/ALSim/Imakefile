@@ -7,7 +7,7 @@ INSTALLDIR    = ../..
 SOREV         = 2005.01
 PACKAGENAME   = S4ALSim
 
-SRCS          = MakeRawBPDEvent_503f.$(SrcSuf)  \
+SRCS          = MakeRawBPDEvent_511d.$(SrcSuf)  \
 	        MakeRawEventMC.$(SrcSuf)  \
 	        MakeEventData.$(SrcSuf)  \
 	        ALEvent.$(SrcSuf)  \
