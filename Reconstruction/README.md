@@ -7,24 +7,24 @@ ROOT, libx11-dev, libxpm-dev, xmkmf
 
 Instructions to install and use the package:
 
-**Download the package, in the power directory, type 
+** Download the package, in the power directory, type 
 >source ./setup
  
-**Install the libraries and compile source code by typing:
+** Install the libraries and compile source code by typing:
 >cd src
 
 >make
 
 
-**Come back to the main directory and copy pcm file to lib:
+** Come back to the main directory and copy pcm file to lib:
 
 >cd .. 
 
 >cp src/*/*pcm lib
 
-**Compile the tools.cpp using the command line in HowtoCompiletollscpp.txt 
+** Compile the tools.cpp using the command line in HowtoCompiletollscpp.txt 
 
-**Create the main executable file by typing:
+** Create the main executable file by typing:
 >xmkmf
 
 >make
