@@ -5,13 +5,13 @@ TkrData::TkrData(int eventNumber)
   this->eventNumber = eventNumber;
 	nLayers = 0;
 	stripPitch = 0.228;
-	zLayer.reserve(7);
-	orientation.reserve(7);
-	ladderOffsetLeft.reserve(7);
-	ladderOffsetRight.reserve(7);
-	hits.reserve(7);
-	xHitMC.reserve(7);
-	yHitMC.reserve(7);
+	zLayer.reserve(8);
+	orientation.reserve(8);
+	ladderOffsetLeft.reserve(8);
+	ladderOffsetRight.reserve(8);
+	hits.reserve(8);
+	xHitMC.reserve(8);
+	yHitMC.reserve(8);
 }
 
 void TkrData::addLyr(char orient, double z, double offsetLeft, double offsetRight) {

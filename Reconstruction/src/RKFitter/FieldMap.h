@@ -27,7 +27,10 @@ class FieldMap {
 public:
 	FieldMap(string FileName = " ", string Type = "none", int nPoints = 81);
 	double *GetField(double x, double y, double z);
-	void setOriginStep(double x0 = -200., double dx = 5., double zOffset = -106.3409);
+	//void setOriginStep(double x0 = -200., double dx = 5., double zOffset = -106.3409);
+	//PSM: August 7 2021: New offset for 8 layers -106.3409 -24.8285 =  -131.1694 mm
+	void setOriginStep(double x0 = -200., double dx = 5., double zOffset = -131.1694);
+	
 	void addEntry(float Bx, float By, float Bz);
 	void writeBinaryFile(string fName);
 	float *getEntry(int i);
