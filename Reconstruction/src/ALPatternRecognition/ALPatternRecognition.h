@@ -48,7 +48,6 @@
 #include "TPaveText.h"
 #include "TString.h"
 #include "TH1F.h"
-#include "TF1.h"
 #include "TSystem.h"
 #include "THStack.h"
 #include "TNtuple.h"

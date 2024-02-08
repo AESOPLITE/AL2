@@ -5,6 +5,7 @@
 //* ===================
 //*
 //* (Description)
+//* 01/03/2023  P-S Mangeard: Updates for AL2
 //* 16/03/2017  S. Mechbal
 //*
 //* This is the main program that implements the pattern recognition routine. Hit
@@ -15,7 +16,7 @@
 #include "ALPatternRecognition.h"
 #include "TCollection.h"
 #include "TBox.h"
-
+#include "TF1.h"
 
 using namespace std;
 //Maximum of configuration to try fitting
@@ -84,6 +85,7 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
 
  //cout << "NL = " << NL << "  NLB = " << NLB << "  NLNB = " << NLNB << endl;
  //if not less than 5 layers were touched then don't try pattern recognition
+
  //if(NL<5)
  // {
  //  return 0;
@@ -107,10 +109,10 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
      //cout << "L: "  << L << " "<<xx<< " "<< yy << " " << zz <<   endl;
      // cout << "Hit " << j << "  , L=" << L << ", fstripID " << fstripID << "  nstrip =  " << nstrip << "    x=" << xx << "  y=" << yy << "  z=" << zz << endl;   
 
-     if (L==7 && fstripID==575 &&nstrip==1) //Now layer 8th layer
-      {
-       xx = xx - 32.5*strippitch; //For flight 2018, put the hit in middle of chip 8
-      }
+     //if (L==7 && fstripID==575 &&nstrip==1) //Now layer 8th layer
+     // {
+     //  xx = xx - 32.5*strippitch; //For flight 2018, put the hit in middle of chip 8
+     // }
 
      TVector3 *X = new TVector3(xx,yy,zz);
 
@@ -121,12 +123,10 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
        xnonbend->Add(X);
        switch(L)
             {
-             //case 0: if (abs(re->get_hits().at(j)->get_x())<4) {xtoplayer->Add(X);itop.push_back(kk); nstriptop.push_back(nstrip);NL0=true;NLPRtmp[L]++;}break;
-             case 0: if (abs(re->get_hits().at(j)->get_x())<10) {xtoplayer->Add(X);itop.push_back(kk); nstriptop.push_back(nstrip);NL0=true;NLPRtmp[L]++;}break;
+             case 0: if (abs(re->get_hits().at(j)->get_x())<4) {xtoplayer->Add(X);itop.push_back(kk); nstriptop.push_back(nstrip);NL0=true;NLPRtmp[L]++;}break;
              case 5: if (abs(re->get_hits().at(j)->get_x())<10) {xmid->Add(X);imid.push_back(kk);  nstripmid.push_back(nstrip);NL5=true;NLPRtmp[L]++;}break;
              case 7: if (abs(re->get_hits().at(j)->get_x())<10){xbottomlayer->Add(X);ibottom.push_back(kk); nstripbottom.push_back(nstrip);NL7=true;NLPRtmp[L]++;}
                      //if (fstripID==575 && nstrip==1) L6S575.push_back(1.);//Hits with single strip L6S575
-                     //else L6S575.push_back(0.);
                      L6S575.push_back(0.);
                      break;
             }//end switch
@@ -136,9 +136,6 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
        xbend->Add(X);
        switch(L)
             {
-             //case 1: if (abs(re->get_hits().at(j)->get_y())<6.)   {xbend1->Add(X);ibend1.push_back(kk);nstrip1.push_back(nstrip);  NL1=true;NLPRtmp[L]++;}break;
-             //case 2: if (abs(re->get_hits().at(j)->get_y())<6)    {xbend2->Add(X);ibend2.push_back(kk);nstrip2.push_back(nstrip);  NL2=true;NLPRtmp[L]++;}break;
-             //case 3: if (abs(re->get_hits().at(j)->get_y())<6.25) {xbend3->Add(X);ibend3.push_back(kk);nstrip3.push_back(nstrip);  NL3=true;NLPRtmp[L]++;}break;
              case 1: if (abs(re->get_hits().at(j)->get_y())<10)   {xbend1->Add(X);ibend1.push_back(kk);nstrip1.push_back(nstrip);  NL1=true;NLPRtmp[L]++;}break;
              case 2: if (abs(re->get_hits().at(j)->get_y())<10)   {xbend2->Add(X);ibend2.push_back(kk);nstrip2.push_back(nstrip);  NL2=true;NLPRtmp[L]++;}break;
              case 3: if (abs(re->get_hits().at(j)->get_y())<10)   {xbend3->Add(X);ibend3.push_back(kk);nstrip3.push_back(nstrip);  NL3=true;NLPRtmp[L]++;}break;
@@ -370,14 +367,21 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  //cout << " npointsNB = " << npointsNB << ", NLNB = " << NLNB << endl;
 
  // if less then 2 hits in non-bending plane, can't reconstruct
- if(NLNB <2)
+ if(NLNB <1)
   {
-   //  cout << "here we are" << endl;
+   //  cout << "here we are NLNB<1" << endl;
    return 0;
   }
 
+ if(NLNB ==1 && ntop==0)
+  {
+   //cout << "here we are NLNB=1 and ntop=0" << endl;
+   return 0;
+  }  
+  
  if(NConf<=0 || NConf>MAXNB)
   {
+   //cout << "here we are: NConf>MAXNB" << endl;
    return 0;
   }
 
@@ -393,7 +397,10 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
 
  //fit all possible lines
  Int_t NConfig = 0;
- for(int m=0; m<ntop; m++)
+ 
+ if(NLNB>=2)
+  {
+   for(int m=0; m<ntop; m++)
    {
     for(int n=0; n<nbottom; n++)
       {
@@ -427,7 +434,7 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
             else if(nstripbottom.at(n)==3) sigmabottom= 2*sigma_reso;
  	    else if(nstripbottom.at(n)==2) sigmabottom=sigma_reso/(TMath::Sqrt(2.));
      	    else sigmabottom=sigma_reso;
- 	    if(L6S575.at(n)==1) sigmabottom=64*sigma_reso;
+ 	    //if(L6S575.at(n)==1) sigmabottom=64*sigma_reso;
             // cout << " nstripbottom = " << nstripbottom.at(n) << " sigmabottom = " << sigmabottom << endl;
             //cout << "x2 = " << xx2->X() << " z2 = " << xx2->Z() << endl;
             gNonBending2[NConfig]->SetPointError(gNonBending2[NConfig]->GetN()-1,sigmabottom,0);
@@ -500,6 +507,7 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  	 }//end o
       }//end n
    }//end m
+  } //end if(NLNB>=2)
 
 
  //GET BEST FIT PARAMETERS
@@ -507,7 +515,8 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  int indexB = min_element(chisquareB.begin(), chisquareB.end()) - chisquareB.begin();
 
  //NON-BENDING
- int index = min_element(chisquare.begin(), chisquare.end()) - chisquare.begin();
+ int index = 0;
+ index=min_element(chisquare.begin(), chisquare.end()) - chisquare.begin();
 
  Double_t a = invertedparabolas[indexB]->GetParameter(2);
  Double_t b = invertedparabolas[indexB]->GetParameter(1);
@@ -523,14 +532,15 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  float lim=zL[1];//z position of 2nd layer
  float zT1=33.782+0.25; //z position of middle of T1
  float zT3=0.+0.25; //z position of middle of T3
- float zT4=-28.07297+0.5; //z position of middle of T4
- float zG=-0.5588+0.25; //z position of middle of G
+ float zG=0.-0.25; //z position of middle of G
+ float zT4=-27.5891+0.25; //z position of middle of T4
  float diff=2*a*lim+2*a*zz0+b;
  float aa=invertedparabolas[indexB]->Eval(lim);
 
  float YT1PR=(zT1-lim)*diff+aa; //PR Y-position in T1
  float YT3PR=(zT3-lim)*diff+aa; //PR Y-position in T3
- float YGPR=(zG-lim)*diff+aa; //PR Y-position in T3
+ float YGPR=(zG-lim)*diff+aa; //PR Y-position in G
+ 
  re->set_thBiPR(TMath::ATan(diff));
  re->set_YT1PR(YT1PR);
  re->set_YT3PR(YT3PR);
@@ -550,23 +560,36 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
 
  //NON-BENDING
  //cout << " index of min chisquare in NB plane i = " << index << endl;
- Double_t p0 = line[index]->GetParameter(0);
- Double_t p1 = line[index]->GetParameter(1);					     //p1 = 1/tanl
- float XT1PR=line[index]->Eval(zT1);
- float XT3PR=line[index]->Eval(zT3);
- float XT4PR=line[index]->Eval(zT4);
- float XGPR=line[index]->Eval(zG);
+ Double_t p0 =-999;
+ Double_t p1 =-999;
+ float XT1PR=-999;
+ float XT3PR=-999;
+ float XT4PR=-999;
+ float XGPR=-999;
+ float thetaNB=0;
+ float chi2NBPR=-999;
+ if(NLNB>=2)
+   {  
+    p0=line[index]->GetParameter(0);
+    p1=line[index]->GetParameter(1);					     //p1 = 1/tanl
+ 
+    XT1PR=line[index]->Eval(zT1);
+    XT3PR=line[index]->Eval(zT3);
+    XT4PR=line[index]->Eval(zT4);
+    XGPR=line[index]->Eval(zG);
+    chi2NBPR=chisquare[index];
+    thetaNB = TMath::ATan(p1);
+   }
+      
  re->set_XT1PR(XT1PR);
  re->set_XT3PR(XT3PR);
- re->set_XT4PR(XT4PR);
  re->set_XGPR(XGPR);
-
+ re->set_XT4PR(XT4PR);
 
  //Fill PR coordinates
  re->set_interPR(p0);
  re->set_slopePR(p1);
- re->set_chi2NBPR(chisquare[index]);
- float thetaNB = TMath::ATan(p1);
+ re->set_chi2NBPR(chi2NBPR);
  re->set_thNBPR(thetaNB);
 
  //Interpolate bending plane hits in the non-bending plane
@@ -583,19 +606,23 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
    }//l
 
  //cout <<"Interpolation in NB plane done " << endl;
- for(int l=0; l<nhitNB[index]; l++)
-   {
-    //index of chosen points given by array indicesNB
-    int kk = indicesNB[index]->At(l);
-    //cout << "kk = " << kk << endl;
-    re->get_hits().at(kk)->set_flagPR(true);
-    //cout << "In PR, hit index " << kk << " set_flagPR " << endl;
-    if(p1!=0) re->get_hits().at(kk)->set_zPR(re->get_hits().at(kk)->get_z());
-    re->get_hits().at(kk)->set_xPR(p1*re->get_hits().at(kk)->get_z()+p0);
-    //extrapolate the yPR from the fit in the bending plane
-    if(NLB>=3)re->get_hits().at(kk)->set_yPR(invertedparabolas[indexB]->Eval(re->get_hits().at(kk)->get_z()));
-    //cout << "next one " << endl;
-   }//l
+ if(NLNB>=2)
+  {  
+   for(int l=0; l<nhitNB[index]; l++)
+    {
+     //index of chosen points given by array indicesNB
+     int kk = indicesNB[index]->At(l);
+     //cout << "kk = " << kk << endl;
+     re->get_hits().at(kk)->set_flagPR(true);
+     //cout << "In PR, hit index " << kk << " set_flagPR " << endl;
+     if(p1!=0) re->get_hits().at(kk)->set_zPR(re->get_hits().at(kk)->get_z());
+     re->get_hits().at(kk)->set_xPR(p1*re->get_hits().at(kk)->get_z()+p0);
+     //extrapolate the yPR from the fit in the bending plane
+     if(NLB>=3)re->get_hits().at(kk)->set_yPR(invertedparabolas[indexB]->Eval(re->get_hits().at(kk)->get_z()));
+     //cout << "next one " << endl;
+    }//l
+  }// if(NLNB>=2)
+  
  //cout << "Interpolation in B plane done" << endl;
 
  //Calculate and set directional cosines for each hit
@@ -619,25 +646,57 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
    }	//end for j
 
  //Calculate and set momentum and total energy of particle from PR fit
-
  //Signed curvature at the 4 points of the bending plane
  double zzz[5]={zL[6],zL[4],zL[3],zL[2],zL[1]};
  double curv[5]={0,0,0,0,0};
- TF1* fcurv=new TF1("fcurv","2*[0]/TMath::Power(1+TMath::Power(2*[0]*x+[1],2),3./2.)",-20,20);
+ TF1* fcurv=new TF1("fcurv","2*[0]/TMath::Power(1+TMath::Power(2*[0]*x+[1],2),3./2.)",-30,30);
  fcurv->SetParameter(0,a);
  fcurv->SetParameter(1,2*a*zz0+b);
  double CurvMean=0;
  for(int ij=0;ij<5;ij++)
    {
     curv[ij]= fcurv->Eval(zzz[ij]);
-    CurvMean+=	curv[ij]/5;
    }
  double Rmean=fabs(1./curv[2]);
+
+ int Npo=21;
+ for(int ij=0;ij<Npo;ij++)
+   {
+    CurvMean+=	fcurv->Eval(zL[4]+ij*fabs(zL[2]-zL[4])/(Npo-1))/Npo;
+   }
+   
+ if (NLNB==1 && NLB==3 && layer4==0 && layer5==0)  
+  {
+    CurvMean=0;
+    for(int ij=0;ij<Npo;ij++)
+       {
+        CurvMean+=	fcurv->Eval(zL[3]+ij*fabs(zL[2]-zL[3])/(Npo-1))/Npo;
+       }
+  }
+        
+   //Default is the average of the 4 historical layers around the magnet
+ //for(int ij=0;ij<5;ij++)
+ //  {
+ //   CurvMean+=	curv[ij]/5;
+ //  }     
  if(CurvMean!=0)	 Rmean=fabs(1./CurvMean);
+
+   
+ //if (NLB==3)
+ //  {
+ //   if(layer1>0 && layer2>0 && layer3>0)   Rmean=1./fabs((fcurv->Eval(zzz[2])+fcurv->Eval(zzz[3]))/2.); //l2 and l3
+ //   if(layer3>0 && layer4>0 && layer5>0)   Rmean=1./fabs((fcurv->Eval(zzz[1])+fcurv->Eval(zzz[2]))/2.); //l3 and l4
+ //  }
+ 
+ //if(NLNB<2) Rmean=1./fabs((fcurv->Eval(zzz[2])+fcurv->Eval(zzz[3]))/2.);
+ 
  //Extract a simple estimation of energy from the average of the 4 curvature a radius
  double B=0.3; //in T
  double Pt=0.3 * B *	0.01*Rmean; //in GeV
- double p0PR= Pt / TMath::Cos(fabs(thetaNB));   //in GeV
+ double p0PR= Pt;
+ 
+ 
+ if(NLNB>=2) p0PR=p0PR / TMath::Cos(fabs(thetaNB));   //in GeV
  double mass=0;
  int type;
  double Q =  TMath::Sign(1,deflection);
@@ -677,7 +736,7 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  for(int z =0; z<NConf;z++)
    {
     //cout << "nonbending z = " << z << endl;
-    delete indicesNB[z];
+    if(NLNB>=2) delete indicesNB[z];
    }
 
  delete[] parabolas;
