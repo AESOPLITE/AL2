@@ -15,11 +15,14 @@ Instructions to install and use the package:
 
 >make
 
+
 **Come back to the main directory and copy pcm file to lib:
 
 >cd .. 
 
 >cp src/*/*pcm lib
+
+**Compile the tools.cpp using the command line in HowtoCompiletollscpp.txt 
 
 **Create the main executable file by typing:
 >xmkmf
