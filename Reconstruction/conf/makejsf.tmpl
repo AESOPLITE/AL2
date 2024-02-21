@@ -19,12 +19,12 @@ ROOT_VERSION = __ROOT_VERSION__
 ROOT_MINORVERSION = __ROOT_MINORVERSION__
 ROOT_PATCHLEVEL= __ROOT_PATCHLEVEL__
 ROOT_FULLVERSION= __ROOT_FULLVERSION__
-G77EGCS_VERSION = __G77EGCS_VERSION__
-G77EGCS_MINORVERSION = __G77EGCS_MINORVERSION__
-G77EGCS_PATCHLEVEL = __G77EGCS_PATCHLEVEL__
+//G77EGCS_VERSION = __G77EGCS_VERSION__
+//G77EGCS_MINORVERSION = __G77EGCS_MINORVERSION__
+//G77EGCS_PATCHLEVEL = __G77EGCS_PATCHLEVEL__
 UNAME_MACHINE = __UNAME_MACHINE__
 UNAME_SYSNAME = __UNAME_SYSNAME__
-G77EGCS_LIBNAME = __G77EGCS_LIBNAME__
+//G77EGCS_LIBNAME = __G77EGCS_LIBNAME__
 
 DllSuf        = $(SOEXT)
 DylibSuf      = $(SOEXT)
@@ -84,8 +84,10 @@ CXXFLAGS      = -Wall -fPIC \
 SOFLAGS       = -shared -rdynamic
 LDFLAGS       = $(ANALLIB) $(GLIBS) -rdynamic
 LIBS          = $(ROOTLIBS) -lm -ldl
+//GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+//		-lXpm -lX11 $(LIBF2C) -lm -ldl
 GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
-		-lXpm -lX11 $(LIBF2C) -lm -ldl
+		-lXpm -lX11 -lm -ldl
 BLOCKDATA     = 
 DEPENDFILES  += $(shell cxxdepends)
 #endif
@@ -109,8 +111,10 @@ CXXFLAGS      = -Wall -fsigned-char -fPIC \
 SOFLAGS       = -shared -rdynamic
 LDFLAGS       = $(ANALLIB) $(GLIBS) -rdynamic
 LIBS          = $(ROOTLIBS) -lm -ldl
+//GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+//                -lXpm -lX11 $(LIBF2C) -lm -ldl
 GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
-                -lXpm -lX11 $(LIBF2C) -lm -ldl
+                -lXpm -lX11 -lm -ldl
 BLOCKDATA     = 
 DEPENDFILES  += $(shell cxxdepends)
 #endif
@@ -145,8 +149,10 @@ SOFLAGS       = $(DYLIBFLAGS)
 SHLIBLDFLAGS  = $(DYLDFLAGS)
 LDFLAGS       = -m32 $(ANALLIB) $(GLIBS) -Xlinker -bind_at_load
 LIBS          = $(ROOTLIBS) -L/usr/local/lib -lm -ldl
+//GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+//                -lXpm -lX11 $(LIBF2C) -L/usr/local/lib -lm -ldl
 GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
-                -lXpm -lX11 $(LIBF2C) -L/usr/local/lib -lm -ldl
+                -lXpm -lX11 -L/usr/local/lib -lm -ldl
 /* DYLDEXTRALIBS = -lcc_dynamic */
 PDFLIB	      = -lpdflib
 BLOCKDATA     = 
@@ -270,8 +276,10 @@ CXXFLAGS      = +W70,495,740,749,829,823 -DR__ACC -z +Z \
 SOFLAGS       = -b -z -Wl,+vnocompatwarnings -Wl,-E
 LDFLAGS       = -z -Wl,+s -Wl,-E $(ANALLIB) $(GLIBS)
 LIBS          = $(ROOTLIBS) -L/usr/lib -lm -ldld
+//GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) \
+//		$(LIBF2C) -L/usr/lib -lm -ldld
 GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) \
-		$(LIBF2C) -L/usr/lib -lm -ldld
+		-L/usr/lib -lm -ldld
 BLOCKDATA     = 
 DEPENDFILES   += -I/opt/aCC/include -I/opt/aCC/include/iostream \
                 -I/usr -I/usr/include
