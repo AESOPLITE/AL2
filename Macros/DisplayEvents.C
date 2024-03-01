@@ -65,7 +65,7 @@ void DisplayEvents()
  float*TrigThresh=new float[5];
  for(int i=0;i<nbl;i++)TckZPos[i]=OffsetLL[i]=OffsetRL[i]=0;
  for(int i=0;i<5;i++)TrigThresh[i]=0;
- int geoconf=11;
+ int geoconf=12;
  string paramfile=Form("Dataparameters%d.dat",geoconf); 
 
  LoadDataparameters(paramfile,TckZPos,OffsetLL,OffsetRL,TrigThresh);
@@ -78,11 +78,11 @@ void DisplayEvents()
    } 
 
  //string Inppath="/media/psmangeard/DATA/Documents/UDEL/AESOPLITE2/NewPSOCRuns";
- string Inppath="/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData";
+ string Inppath="/data/psmangeard/AESOPLITE2/McMurdo2023/Runs";
  //string startfile="NL2685_2688_2700.BPD";
- string startfile="NL3132.BPD";
+ string startfile="NL4175.BPD";
  string endfile=".EVENT_RK";
- string directory= "/media/psmangeard/DATA2/AESOPLite2/McMurdo2023/FlightData";
+ string directory= "/data/psmangeard/AESOPLITE2/McMurdo2023/Runs";
 
  //float mass=0.000511;//electon mass in GeV
  //if(t==11 || t==10)     mass=0.10566;//muon mass in GeV
@@ -240,23 +240,24 @@ void DisplayEvents()
     ///////////////////////////////
  
     //cout << "Event " << i << ", NLNB = " << NLNB << ", NLB = " << NLB << endl;      
-    //if(e->get_deflecPR()!=0) FLAGFIT=true;
-
+    if(e->get_deflecPR()==0) continue;
+    if(e->get_deflecPR()!=0) FLAGFIT=true;
+         
     //if(NLB!=5 || NLNB!=3) continue;
     //if(e->get_deflecPR()==0) continue;
     //if(e->get_TrTrig1()!=1)      continue; 
     //if(e->get_TrTrig0()!=1)      continue; 
     //if(abs(pPR)>100) continue;
-    if(EG>15) continue;
-    if(E1>=1000) continue;
+    //if(EG>15) continue;
+    //if(E1>=1000) continue;
     //if(E2<30) continue;
-    if(E3>=1000) continue;
-    if(E4>=1000) continue;
+    //if(E3>=1000) continue;
+    //if(E4>=1000) continue;
     //if(Nhits<=8) continue;
 
-    if(e->get_T1()!=1) continue;
-    if(e->get_T2()!=1) continue;
-    if(e->get_T3()!=1) continue;
+    //if(e->get_T1()!=1) continue;
+    //if(e->get_T2()!=1) continue;
+    //if(e->get_T3()!=1) continue;
     
     ///////////////////////////////    
     //Extract hits information
@@ -452,7 +453,8 @@ void DisplayEvents()
     TLine**Line=new TLine*[nbl];
     TLine**LinePR=new TLine*[nbl];
 	  
-    double shift8L=-2.48285;	    
+    //double shift8L=-2.48285;	    
+    double shift8L=-1.99898;	    
     //Magnets 
     TBox*boxM1=new TBox(-15,-9.61682+shift8L,-6.703,-9.61682+4.59994+shift8L);
     TBox*boxM2=new TBox(-15,-16.2513+shift8L,-6.703,-16.2513+4.59994+shift8L);
@@ -506,7 +508,7 @@ void DisplayEvents()
 
     TBox*boxG2=new TBox(+3.5,-0.5588,13.5,-0.5588+0.5);
     boxG2->SetFillColor(kRed);
-//    if(guard)boxG2->SetFillColor(kGreen);     
+    //if(guard)boxG2->SetFillColor(kGreen);     
     if(EG>200)boxG2->SetFillColor(8); 
     TPaveText*PHG=new TPaveText(13,-3,20,1);
     PHG->AddText(Form("G=%4d", int(EG)));
@@ -515,10 +517,10 @@ void DisplayEvents()
     
     //T4
     //TBox*boxT4=new TBox(-18.,-25.59012+shift8L,18.,-25.59012+1+shift8L);
-    TBox*boxT4=new TBox(-15.,-25.59012+shift8L,15.,-25.59012+1+shift8L);
+    TBox*boxT4=new TBox(-15.,-27.5891,15.,-27.5891+0.5);
     boxT4->SetFillColor(kRed);
     if(T4)boxT4->SetFillColor(8);
-    TPaveText*PHT4=new TPaveText(13,-25+shift8L,20,-21+shift8L);
+    TPaveText*PHT4=new TPaveText(13,-27.5891,20,-23.5891);
     PHT4->AddText(Form("T4=%4d",int(E4)));
     //PHT4->AddText(Form("T4"));
     PHT4->SetFillStyle(0);PHT4->SetBorderSize(0);

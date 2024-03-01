@@ -35,10 +35,11 @@ FieldMap::FieldMap(string FileName, string Type, int nPoints)
 		return;
 	}
 	zOffset = -106.3409;
-	//PSM: August 7 2021: New offset for 8 layers -106.3409 -24.8285 =  -131.1694 mm
-        //zOffset = -131.1694;  //Issue found with that position
-	//PSM: February 1, 2024: New offset for 8 layers -106.3409 -19.9898 =  -126.3307 mm
-        zOffset = -126.3307 ;
+	//PSM: August 7 2021: New offset for 8 layers -106.3409 -24.8285 =  -131.1694 mm 
+	//PSM: Feb 27, 2024: 24.8285 likely measured by James and Pierre-Simon
+	//Height of one frame is 1.99898cm
+	//So the spacer should be 0.48387cm
+        zOffset = -131.1694;  //Issue found with that position
 	cout << "FieldMap: z position of the magnet center is set to " << zOffset << endl;
 	nEntered = nFldPnt*nFldPnt*nFldPnt;
 	cout << "Loading the Field Map from " << FileName << "; zOffset=" << zOffset << endl;

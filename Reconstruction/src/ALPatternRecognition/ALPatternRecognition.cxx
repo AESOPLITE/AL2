@@ -532,8 +532,8 @@ int ALPatternRecognition::FindPattern(ALEvent *re, int DataType, float* zL,float
  float lim=zL[1];//z position of 2nd layer
  float zT1=33.782+0.25; //z position of middle of T1
  float zT3=0.+0.25; //z position of middle of T3
- float zG=0.-0.25; //z position of middle of G
- float zT4=-27.5891+0.25; //z position of middle of T4
+ float zG=-0.5588+0.25; //z position of middle of G
+ float zT4=-27.70505+0.25; //z position of middle of T4
  float diff=2*a*lim+2*a*zz0+b;
  float aa=invertedparabolas[indexB]->Eval(lim);
 

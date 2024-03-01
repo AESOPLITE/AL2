@@ -23,11 +23,11 @@ int MakeRawBPDEventIT(string filename)
  //Open input file
  ifstream filestr;
  filestr.open(input.at(0));
- if(!filestr.is_open())
-  {
-   cout << "The file " <<input.at(0) << " is not open ... "<< endl ;
-   return -1;
-  }
+ //if(!filestr.is_open())
+ // {
+ //  cout << "The file " <<input.at(0) << " is not open ... "<< endl ;
+ //  return -1;
+ // }
 
  //Output root file
  TFile*fileout=new TFile(Form("%s.root",input.at(0).c_str()),"RECREATE");

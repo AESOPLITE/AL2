@@ -39,16 +39,16 @@ int MakeRawEventMCDisc(int typeT,int Ene,int seed,int cycle,string Inppath,strin
 
  TFile *file;
  TFile *fileout;
- //Input file
- //file=new //TFile(Form("%s/%d/%s/%s/%s_%d_%dMeV%d%03d%s.root",Inppath.c_str(),typeT,source.c_str(),Inppath2.c_str(),startfile.c_str(),typeT,Ene,seed,cycle,endfile.c_str()),"READ");
- //For V3
- file=new TFile(Form("%s/%d/%s/%s/%s_%d_%d%03d%s.root",Inppath.c_str(),typeT,source.c_str(),Inppath2.c_str(),startfile.c_str(),typeT,seed,cycle,endfile.c_str()),"READ");
+ //Input file V4
+ file=new TFile(Form("%s/%d/%s/%s/%s_%d_%dMeV%d%03d%s.root",Inppath.c_str(),typeT,source.c_str(),Inppath2.c_str(),startfile.c_str(),typeT,Ene,seed,cycle,endfile.c_str()),"READ");
+ //For V3 and V5
+ //file=new TFile(Form("%s/%d/%s/%s/%s_%d_%d%03d%s.root",Inppath.c_str(),typeT,source.c_str(),Inppath2.c_str(),startfile.c_str(),typeT,seed,cycle,endfile.c_str()),"READ");
  cout << "Input file is open" <<endl;
- //Output file
- //fileout=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%dMeV%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,Ene,seed,cycle,endfile.c_str()),"RECREATE");
+ //Output file V4
+ fileout=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%dMeV%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,Ene,seed,cycle,endfile.c_str()),"RECREATE");
  //cout << "Output file " << Form("%s/%d/%s/RawEvent_%s_%d_%dMeV%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,Ene,seed,cycle,endfile.c_str()) << " is created" <<endl;
- //For V3
- fileout=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,seed,cycle,endfile.c_str()),"RECREATE");
+ //For V3 and V5
+ //fileout=new TFile(Form("%s/%d/%s/RawEvent_%s_%d_%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,seed,cycle,endfile.c_str()),"RECREATE");
  //cout << "Output file " << Form("%s/%d/%s/RawEvent_%s_%d_%d%03d%s.root",Outpath.c_str(),typeT,source.c_str(),startfile.c_str(),typeT,seed,cycle,endfile.c_str()) << " is created" <<endl;
 
  //Get ntuple from the input file
