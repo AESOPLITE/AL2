@@ -8,7 +8,7 @@ int main(int argc, char*argv[])
  if(argc!=5)
   {
    cout << "Wrong number of parameters!!!!" << endl;
-   cout << "The program needs 5 input parameters:"<< endl;
+   cout << "The program needs 4 input parameters:"<< endl;
    cout << "First is Fluka type of simulated particles" <<endl;
    cout << "Second is first cycle to reconstruct (Starts at 1)" <<endl;
    cout << "Third is the number of cycle to reconstruct" <<endl;
